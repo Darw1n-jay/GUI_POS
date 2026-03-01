@@ -6,7 +6,7 @@
        package test_package;
 
       import javax.swing.*;
-      import pos.model.Models.User;
+      import logic.User;
 import test_package.ADMIN.MANAGE_PRODUCT_DASH;
 
        public class ADMIN_DASH extends javax.swing.JFrame {
@@ -21,11 +21,16 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        DASHBOARD_SUMMARY = new javax.swing.JButton();
         MANAGE_PRODUCT = new javax.swing.JButton();
         VIEW_INVENTORY = new javax.swing.JButton();
         MAKE_SALE = new javax.swing.JButton();
         MANAGE_SALE = new javax.swing.JButton();
         APPROVE_REGISTER = new javax.swing.JButton();
+        MANAGE_USER = new javax.swing.JButton();
+        SALES_REPORT = new javax.swing.JButton();
+        LOW_STOCK = new javax.swing.JButton();
+        SEARCH_PRODUCT = new javax.swing.JButton();
         LOGOUT = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -34,6 +39,17 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        DASHBOARD_SUMMARY.setBackground(new java.awt.Color(0, 0, 0));
+        DASHBOARD_SUMMARY.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
+        DASHBOARD_SUMMARY.setForeground(new java.awt.Color(255, 255, 255));
+        DASHBOARD_SUMMARY.setText("DASHBOARD");
+        DASHBOARD_SUMMARY.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DASHBOARD_SUMMARYActionPerformed(evt);
+            }
+        });
+        jPanel1.add(DASHBOARD_SUMMARY, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 30, 180, 40));
 
         MANAGE_PRODUCT.setBackground(new java.awt.Color(0, 0, 0));
         MANAGE_PRODUCT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
@@ -44,7 +60,7 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
                 MANAGE_PRODUCTActionPerformed(evt);
             }
         });
-        jPanel1.add(MANAGE_PRODUCT, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 40, 160, 40));
+        jPanel1.add(MANAGE_PRODUCT, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, 180, 40));
 
         VIEW_INVENTORY.setBackground(new java.awt.Color(0, 0, 0));
         VIEW_INVENTORY.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
@@ -55,25 +71,84 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
                 VIEW_INVENTORYActionPerformed(evt);
             }
         });
-        jPanel1.add(VIEW_INVENTORY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 100, 160, 40));
+        jPanel1.add(VIEW_INVENTORY, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 180, 40));
 
         MAKE_SALE.setBackground(new java.awt.Color(0, 0, 0));
         MAKE_SALE.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
         MAKE_SALE.setForeground(new java.awt.Color(255, 255, 255));
         MAKE_SALE.setText("MAKE SALE");
-        jPanel1.add(MAKE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 160, 160, 40));
+        MAKE_SALE.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MAKE_SALEActionPerformed(evt);
+            }
+        });
+        jPanel1.add(MAKE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, 180, 40));
 
         MANAGE_SALE.setBackground(new java.awt.Color(0, 0, 0));
         MANAGE_SALE.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
         MANAGE_SALE.setForeground(new java.awt.Color(255, 255, 255));
         MANAGE_SALE.setText("MANAGE SALES");
-        jPanel1.add(MANAGE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 220, 160, 40));
+        MANAGE_SALE.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MANAGE_SALEActionPerformed(evt);
+            }
+        });
+        jPanel1.add(MANAGE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 230, 180, 40));
 
         APPROVE_REGISTER.setBackground(new java.awt.Color(0, 0, 0));
         APPROVE_REGISTER.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
         APPROVE_REGISTER.setForeground(new java.awt.Color(255, 255, 255));
         APPROVE_REGISTER.setText("APPROVE REGISTER");
-        jPanel1.add(APPROVE_REGISTER, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 290, 160, 40));
+        APPROVE_REGISTER.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                APPROVE_REGISTERActionPerformed(evt);
+            }
+        });
+        jPanel1.add(APPROVE_REGISTER, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 280, 180, 40));
+
+        MANAGE_USER.setBackground(new java.awt.Color(0, 0, 0));
+        MANAGE_USER.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
+        MANAGE_USER.setForeground(new java.awt.Color(255, 255, 255));
+        MANAGE_USER.setText("MANAGE USERS");
+        MANAGE_USER.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MANAGE_USERActionPerformed(evt);
+            }
+        });
+        jPanel1.add(MANAGE_USER, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 330, 180, 40));
+
+        SALES_REPORT.setBackground(new java.awt.Color(0, 0, 0));
+        SALES_REPORT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
+        SALES_REPORT.setForeground(new java.awt.Color(255, 255, 255));
+        SALES_REPORT.setText("SALES REPORT");
+        SALES_REPORT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SALES_REPORTActionPerformed(evt);
+            }
+        });
+        jPanel1.add(SALES_REPORT, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 380, 180, 40));
+
+        LOW_STOCK.setBackground(new java.awt.Color(0, 0, 0));
+        LOW_STOCK.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
+        LOW_STOCK.setForeground(new java.awt.Color(255, 255, 255));
+        LOW_STOCK.setText("LOW STOCK ALERT");
+        LOW_STOCK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LOW_STOCKActionPerformed(evt);
+            }
+        });
+        jPanel1.add(LOW_STOCK, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 430, 180, 40));
+
+        SEARCH_PRODUCT.setBackground(new java.awt.Color(0, 0, 0));
+        SEARCH_PRODUCT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
+        SEARCH_PRODUCT.setForeground(new java.awt.Color(255, 255, 255));
+        SEARCH_PRODUCT.setText("SEARCH PRODUCT");
+        SEARCH_PRODUCT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SEARCH_PRODUCTActionPerformed(evt);
+            }
+        });
+        jPanel1.add(SEARCH_PRODUCT, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 450, 160, 40));
 
         LOGOUT.setBackground(new java.awt.Color(0, 0, 0));
         LOGOUT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
@@ -84,7 +159,7 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
                 LOGOUTActionPerformed(evt);
             }
         });
-        jPanel1.add(LOGOUT, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 360, 160, 40));
+        jPanel1.add(LOGOUT, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 450, 100, 40));
 
         jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -97,6 +172,7 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 520));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
    
 
@@ -110,13 +186,54 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
     }//GEN-LAST:event_MANAGE_PRODUCTActionPerformed
 
     private void LOGOUTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LOGOUTActionPerformed
-                   LOG_IN login = new LOG_IN();
-    login.setVisible(true);
-              // TODO add your handling code here:
+        LOG_IN login = new LOG_IN();
+        login.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_LOGOUTActionPerformed
+    
+    private void MAKE_SALEActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.CASHIER.CREATE_SALE_DASH(currentUser).setVisible(true);
+        this.dispose();
+    }
+    
+    private void MANAGE_SALEActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.MANAGE_SALES_DASH().setVisible(true);
+        this.dispose();
+    }
+    
+    private void APPROVE_REGISTERActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.APPROVE_DASH().setVisible(true);
+        this.dispose();
+    }
+    
+    private void MANAGE_USERActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.MANAGE_USER_DASH().setVisible(true);
+        this.dispose();
+    }
+    
+    private void SALES_REPORTActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.SALES_REPORT_DASH().setVisible(true);
+        this.dispose();
+    }
+    
+    private void LOW_STOCKActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.LOW_STOCK_DASH().setVisible(true);
+        this.dispose();
+    }
+    
+    private void DASHBOARD_SUMMARYActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.DASHBOARD_SUMMARY().setVisible(true);
+        this.dispose();
+    }
+    
+    private void SEARCH_PRODUCTActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.SEARCH_PRODUCT_DASH().setVisible(true);
+        this.dispose();
+    }
 
     private void VIEW_INVENTORYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VIEW_INVENTORYActionPerformed
-        // TODO add your handling code here:
+        new test_package.ADMIN.VIEW_INVE_DASH().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_VIEW_INVENTORYActionPerformed
 
     /**
@@ -157,10 +274,15 @@ import test_package.ADMIN.MANAGE_PRODUCT_DASH;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton APPROVE_REGISTER;
+    private javax.swing.JButton DASHBOARD_SUMMARY;
     private javax.swing.JButton LOGOUT;
+    private javax.swing.JButton LOW_STOCK;
     private javax.swing.JButton MAKE_SALE;
     private javax.swing.JButton MANAGE_PRODUCT;
     private javax.swing.JButton MANAGE_SALE;
+    private javax.swing.JButton MANAGE_USER;
+    private javax.swing.JButton SALES_REPORT;
+    private javax.swing.JButton SEARCH_PRODUCT;
     private javax.swing.JButton VIEW_INVENTORY;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

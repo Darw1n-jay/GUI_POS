@@ -1,4 +1,4 @@
-package pos.model.Models;
+package logic;
 
 public class User {
     public int id;

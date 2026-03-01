@@ -2,18 +2,22 @@ package logic;
 
 import java.sql.*;
 import db.DBConnection;
-import pos.model.Models.User;
 
 public class AuthValidator {
 
     public static LoginResult login(String username, String password) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
         try {
+            conn = DBConnection.getConnection();
             String sql = "SELECT * FROM users WHERE username=? AND password=?";
-            PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+            ps = conn.prepareStatement(sql);
             ps.setString(1, username);
             ps.setString(2, password);
 
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             if (!rs.next()) {
                 return new LoginResult(false, "Invalid credentials", null);
@@ -32,7 +36,12 @@ public class AuthValidator {
             return new LoginResult(true, "Success", user);
 
         } catch (Exception e) {
-            return new LoginResult(false, "Database error", null);
+            e.printStackTrace();
+            return new LoginResult(false, "Database error: " + e.getMessage(), null);
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception ex) {}
+            try { if (ps != null) ps.close(); } catch (Exception ex) {}
+            try { if (conn != null) conn.close(); } catch (Exception ex) {}
         }
     }
 }

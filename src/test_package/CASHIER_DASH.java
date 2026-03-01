@@ -8,7 +8,7 @@ package test_package;
 
 
          import javax.swing.*;
-         import pos.model.Models.User;
+         import logic.User;
 
          public class CASHIER_DASH extends javax.swing.JFrame {
              private User currentUser;
@@ -52,12 +52,22 @@ package test_package;
         jButton2.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("LIST OF MY SALE");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 160, 160, 50));
 
         jButton3.setBackground(new java.awt.Color(0, 0, 0));
         jButton3.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
         jButton3.setText("LIST OF MY PRODUCT");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 260, 160, 50));
 
         jButton4.setBackground(new java.awt.Color(0, 0, 0));
@@ -93,18 +103,31 @@ package test_package;
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-    LOG_IN login = new LOG_IN();
-    login.setVisible(true);
+        LOG_IN login = new LOG_IN();
+        login.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        new test_package.CASHIER.CREATE_SALE_DASH(currentUser).setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
+    
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.CASHIER.MY_SALES_DASH(currentUser).setVisible(true);
+        this.dispose();
+    }
+    
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.CASHIER.MY_PRODUCTS_DASH(currentUser).setVisible(true);
+        this.dispose();
+    }
 
     /**
      * @param args the command line arguments

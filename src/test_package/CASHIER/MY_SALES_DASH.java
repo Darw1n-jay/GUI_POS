@@ -1,0 +1,191 @@
+package test_package.CASHIER;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.List;
+import java.text.SimpleDateFormat;
+import logic.User;
+import model.Sale;
+import model.SaleItem;
+import model.Product;
+import dao.SaleDao;
+import dao.ProductDao;
+
+public class MY_SALES_DASH extends javax.swing.JFrame {
+    private User currentUser;
+
+    public MY_SALES_DASH(User user) {
+        this.currentUser = user;
+        initComponents();
+        loadMySales();
+    }
+    
+    private void loadMySales() {
+        try {
+            DefaultTableModel tableModel = (DefaultTableModel) salesTable.getModel();
+            tableModel.setRowCount(0);
+            
+            List<Sale> sales = SaleDao.getSalesByCashier(currentUser.id);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            for (Sale s : sales) {
+                tableModel.addRow(new Object[]{
+                    s.id, 
+                    String.format("%.2f", s.total),
+                    sdf.format(s.saleDate)
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading sales: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        salesTable = new javax.swing.JTable();
+        btnViewDetails = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        salesTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {},
+            new String [] {"Sale ID", "Total", "Date"}
+        ) {
+            boolean[] canEdit = new boolean [] {false, false, false};
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(salesTable);
+
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 100, 750, 300));
+
+        btnViewDetails.setBackground(new java.awt.Color(0, 0, 0));
+        btnViewDetails.setFont(new java.awt.Font("Sitka Display", 1, 14));
+        btnViewDetails.setForeground(new java.awt.Color(255, 255, 255));
+        btnViewDetails.setText("VIEW DETAILS");
+        btnViewDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewDetailsActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnViewDetails, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 430, 140, 35));
+
+        btnRefresh.setBackground(new java.awt.Color(0, 0, 0));
+        btnRefresh.setFont(new java.awt.Font("Sitka Display", 1, 14));
+        btnRefresh.setForeground(new java.awt.Color(255, 255, 255));
+        btnRefresh.setText("REFRESH");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnRefresh, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 430, 120, 35));
+
+        btnBack.setBackground(new java.awt.Color(0, 0, 0));
+        btnBack.setFont(new java.awt.Font("Sitka Display", 1, 14));
+        btnBack.setForeground(new java.awt.Color(255, 255, 255));
+        btnBack.setText("BACK");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 430, 120, 35));
+
+        jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 24));
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("MY SALES HISTORY");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 30, 280, 40));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/1.png")));
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 530));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnViewDetailsActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            int row = salesTable.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "Please select a sale to view details");
+                return;
+            }
+            
+            int saleId = (int) salesTable.getValueAt(row, 0);
+            List<SaleItem> items = SaleDao.getSaleItems(saleId);
+            
+            StringBuilder details = new StringBuilder("Sale Items:\n\n");
+            for (SaleItem item : items) {
+                Product product = ProductDao.getProductById(item.productId);
+                details.append(String.format("Product: %s\nQty: %d\nPrice: %.2f\nSubtotal: %.2f\n\n",
+                    product.name, item.qty, item.price, item.qty * item.price));
+            }
+            
+            JOptionPane.showMessageDialog(this, details.toString(), "Sale Details", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {
+        loadMySales();
+    }
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.CASHIER_DASH(currentUser).setVisible(true);
+        this.dispose();
+    }
+
+    public static void main(String args[]) {
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(MY_SALES_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new MY_SALES_DASH(null).setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnViewDetails;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable salesTable;
+    // End of variables declaration//GEN-END:variables
+}

@@ -13,7 +13,7 @@ package test_package;
         import javax.swing.JOptionPane;
         import logic.AuthValidator;
         import logic.LoginResult;
-        import pos.model.Models.User;
+        import logic.User;
 
 public class LOG_IN extends javax.swing.JFrame {
 

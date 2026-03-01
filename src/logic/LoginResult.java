@@ -1,7 +1,5 @@
 package logic;
 
-import pos.model.Models.User;
-
 public class LoginResult {
     public boolean success;
     public String message;
