@@ -10,17 +10,25 @@ package test_package;
  * @author manub
  */
 
-        import javax.swing.JOptionPane;
-        import logic.AuthValidator;
-        import logic.LoginResult;
-        import logic.User;
+import java.util.Arrays;
+import javax.swing.JOptionPane;
+import logic.AuthValidator;
+import logic.LoginResult;
+import logic.User;
+import util.AppUI;
 
 public class LOG_IN extends javax.swing.JFrame {
 
     
    public LOG_IN() {
         initComponents();
-        setLocationRelativeTo(null);
+        AppUI.setupFrame(this, "Coffee Shop POS - Login", true);
+        AppUI.setPlaceholder(USER_NAME, "Username");
+        AppUI.setPasswordFieldFeatures(PASSWORD, "Password");
+        AppUI.makePrimary(LOG_INBTN);
+        AppUI.makeSecondary(REGISTERBTN);
+        AppUI.setupDefaultButton(this, LOG_INBTN);
+        REGISTER.setText("No account? Register here.");
     }
   
     /**
@@ -114,7 +122,8 @@ public class LOG_IN extends javax.swing.JFrame {
     private void LOG_INBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LOG_INBTNActionPerformed
     
      String username = USER_NAME.getText().trim();
-    String password = new String(PASSWORD.getPassword());
+    char[] passwordChars = PASSWORD.getPassword();
+    String password = new String(passwordChars);
 
     // Validation
     if (username.isEmpty() || password.isEmpty()) {
@@ -122,6 +131,14 @@ public class LOG_IN extends javax.swing.JFrame {
             "Please enter username and password",
             "Validation Error",
             JOptionPane.WARNING_MESSAGE);
+        if (username.isEmpty()) {
+            USER_NAME.requestFocus();
+            USER_NAME.selectAll();
+        } else {
+            PASSWORD.requestFocus();
+            PASSWORD.selectAll();
+        }
+        Arrays.fill(passwordChars, '\0');
         return;
     }
 
@@ -133,6 +150,9 @@ public class LOG_IN extends javax.swing.JFrame {
             result.message,
             "Login Failed",
             JOptionPane.ERROR_MESSAGE);
+        PASSWORD.requestFocus();
+        PASSWORD.selectAll();
+        Arrays.fill(passwordChars, '\0');
         return;
     }
 
@@ -145,6 +165,7 @@ public class LOG_IN extends javax.swing.JFrame {
         new CASHIER_DASH(user).setVisible(true);
     }
 
+    Arrays.fill(passwordChars, '\0');
     this.dispose();
 
 
@@ -161,35 +182,8 @@ public class LOG_IN extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LOG_IN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LOG_IN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LOG_IN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LOG_IN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new LOG_IN().setVisible(true);
-            }
-        });
+        AppUI.initLookAndFeelOnce();
+        java.awt.EventQueue.invokeLater(() -> new LOG_IN().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

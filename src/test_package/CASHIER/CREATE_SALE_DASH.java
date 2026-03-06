@@ -7,6 +7,7 @@ import logic.User;
 import model.Product;
 import dao.ProductDao;
 import dao.SaleDao;
+import util.AppUI;
 
 public class CREATE_SALE_DASH extends javax.swing.JFrame {
     private User currentUser;
@@ -16,6 +17,15 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
     public CREATE_SALE_DASH(User user) {
         this.currentUser = user;
         initComponents();
+        AppUI.setupFrame(this, "Coffee Shop POS - Create Sale", true);
+        AppUI.styleTable(productTable);
+        AppUI.styleTable(cartTable);
+        AppUI.setPlaceholder(txtQty, "Qty");
+        AppUI.makeSecondary(btnBack);
+        AppUI.makeSecondary(btnRemoveFromCart);
+        AppUI.makeSecondary(btnAddToCart);
+        AppUI.makePrimary(btnCompleteSale);
+        AppUI.setupDefaultButton(this, btnAddToCart);
         loadProducts();
         setupCart();
     }
@@ -154,7 +164,7 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
 
         lblTotal.setFont(new java.awt.Font("Sitka Display", 1, 18));
         lblTotal.setForeground(new java.awt.Color(255, 255, 255));
-        lblTotal.setText("Total: $0.00");
+        lblTotal.setText("Total: ₱0.00");
         jPanel1.add(lblTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 340, 200, 30));
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/1.png")));
@@ -203,7 +213,7 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
             cartModel.addRow(new Object[]{productId, productName, qty, price, subtotal});
             
             totalAmount += subtotal;
-            lblTotal.setText(String.format("Total: $%.2f", totalAmount));
+            lblTotal.setText(String.format("Total: ₱%.2f", totalAmount));
             txtQty.setText("1");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
@@ -219,7 +229,7 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
         
         double subtotal = (double) cartModel.getValueAt(row, 4);
         totalAmount -= subtotal;
-        lblTotal.setText(String.format("Total: $%.2f", totalAmount));
+        lblTotal.setText(String.format("Total: ₱%.2f", totalAmount));
         cartModel.removeRow(row);
     }
 
@@ -230,7 +240,23 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
                 return;
             }
             
-            int saleId = SaleDao.createSale(currentUser.id, totalAmount);
+            // Show payment method selection dialog
+            String[] paymentOptions = {"Cash", "GCash"};
+            String selectedPayment = (String) JOptionPane.showInputDialog(
+                this,
+                "Select Payment Method:",
+                "Payment Method",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                paymentOptions,
+                paymentOptions[0]
+            );
+            
+            if (selectedPayment == null) {
+                return; // User cancelled
+            }
+            
+            int saleId = SaleDao.createSale(currentUser.id, totalAmount, selectedPayment);
             
             for (int i = 0; i < cartModel.getRowCount(); i++) {
                 int productId = (int) cartModel.getValueAt(i, 0);
@@ -251,11 +277,11 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new java.awt.Dimension(450, 400));
             
-            JOptionPane.showMessageDialog(this, scrollPane, "Receipt - Sale #" + saleId, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, scrollPane, "Receipt - Sale #" + saleId + " (" + selectedPayment + ")", JOptionPane.INFORMATION_MESSAGE);
             
             cartModel.setRowCount(0);
             totalAmount = 0.0;
-            lblTotal.setText("Total: $0.00");
+            lblTotal.setText("Total: ₱0.00");
             loadProducts();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
@@ -268,21 +294,10 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
     }
 
     public static void main(String args[]) {
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception ex) {
-            java.util.logging.Logger.getLogger(CREATE_SALE_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new CREATE_SALE_DASH(null).setVisible(true);
-            }
+        AppUI.initLookAndFeelOnce();
+        java.awt.EventQueue.invokeLater(() -> {
+            User demo = new User(0, "cashier", User.Role.CASHIER);
+            new CREATE_SALE_DASH(demo).setVisible(true);
         });
     }
 

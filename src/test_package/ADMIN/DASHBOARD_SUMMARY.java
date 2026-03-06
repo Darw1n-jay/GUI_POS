@@ -29,7 +29,7 @@ public class DASHBOARD_SUMMARY extends javax.swing.JFrame {
                      "FROM sales WHERE DATE(sale_date) = DATE('now')")) {
                 if (rs.next()) {
                     lblTodaySales.setText("Today's Sales: " + rs.getInt("count"));
-                    lblTodayRevenue.setText(String.format("Today's Revenue: $%.2f", rs.getDouble("revenue")));
+                    lblTodayRevenue.setText(String.format("Today's Revenue: ₱%.2f", rs.getDouble("revenue")));
                 }
             }
             
@@ -37,7 +37,7 @@ public class DASHBOARD_SUMMARY extends javax.swing.JFrame {
             try (Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery("SELECT COALESCE(SUM(total), 0) as total FROM sales")) {
                 if (rs.next()) {
-                    lblTotalRevenue.setText(String.format("Total Revenue: $%.2f", rs.getDouble("total")));
+                    lblTotalRevenue.setText(String.format("Total Revenue: ₱%.2f", rs.getDouble("total")));
                 }
             }
             
@@ -109,12 +109,12 @@ public class DASHBOARD_SUMMARY extends javax.swing.JFrame {
 
         lblTodayRevenue.setFont(new java.awt.Font("Sitka Display", 1, 16));
         lblTodayRevenue.setForeground(new java.awt.Color(255, 255, 255));
-        lblTodayRevenue.setText("Today's Revenue: $0.00");
+        lblTodayRevenue.setText("Today's Revenue: ₱0.00");
         jPanel1.add(lblTodayRevenue, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 220, 300, 40));
 
         lblTotalRevenue.setFont(new java.awt.Font("Sitka Display", 1, 16));
         lblTotalRevenue.setForeground(new java.awt.Color(255, 255, 255));
-        lblTotalRevenue.setText("Total Revenue: $0.00");
+        lblTotalRevenue.setText("Total Revenue: ₱0.00");
         jPanel1.add(lblTotalRevenue, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 280, 300, 40));
 
         lblLowStock.setFont(new java.awt.Font("Sitka Display", 1, 16));

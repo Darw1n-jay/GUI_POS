@@ -34,10 +34,10 @@ public class SALES_REPORT_DASH extends javax.swing.JFrame {
                 totalRevenue += revenue;
                 totalTransactions += transactions;
                 
-                model.addRow(new Object[]{date, transactions, String.format("$%.2f", revenue)});
+                model.addRow(new Object[]{date, transactions, String.format("₱%.2f", revenue)});
             }
             
-            lblTotalRevenue.setText(String.format("Total Revenue: $%.2f", totalRevenue));
+            lblTotalRevenue.setText(String.format("Total Revenue: ₱%.2f", totalRevenue));
             lblTotalTransactions.setText("Total Transactions: " + totalTransactions);
             
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class SALES_REPORT_DASH extends javax.swing.JFrame {
 
         lblTotalRevenue.setFont(new java.awt.Font("Sitka Display", 1, 16));
         lblTotalRevenue.setForeground(new java.awt.Color(255, 255, 255));
-        lblTotalRevenue.setText("Total Revenue: $0.00");
+        lblTotalRevenue.setText("Total Revenue: ₱0.00");
         jPanel1.add(lblTotalRevenue, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 370, 300, 30));
 
         lblTotalTransactions.setFont(new java.awt.Font("Sitka Display", 1, 16));

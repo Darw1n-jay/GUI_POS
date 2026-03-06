@@ -83,7 +83,7 @@ public class MY_PRODUCTS_DASH extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 24));
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("PRODUCT LIST");
+        jLabel1.setText("COFFEE PRODUCT LIST");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 30, 200, 40));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/1.png")));

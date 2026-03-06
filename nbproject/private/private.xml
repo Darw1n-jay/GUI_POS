@@ -3,17 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/1.png</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/db/DBConnection.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/test_package/ADMIN/APPROVE_DASH.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/test_package/LOG_IN.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/test_package/ADMIN_DASH.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/app/Main.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/test_package/REGISTER_DASH.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/3.png</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/test_package/ADMIN/DASHBOARD_SUMMARY.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/test_package/CASHIER_DASH.java</file>
-            <file>file:/C:/Users/user/OneDrive/Desktop/Darwin/GUI_POS/src/6.png</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/util/ReceiptPrinter.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/ADMIN_DASH.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/CASHIER/CREATE_SALE_DASH.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/REGISTER_DASH.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/LOG_IN.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/ADMIN/APPROVE_DASH.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/ADMIN/DASHBOARD_SUMMARY.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/ADMIN/SEARCH_PRODUCT_DASH.java</file>
+            <file>file:/C:/Users/manub/OneDrive/Desktop/GUI_JAVA/GUI_POS/src/test_package/CASHIER_DASH.java</file>
         </group>
     </open-files>
 </project-private>

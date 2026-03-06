@@ -12,14 +12,33 @@ import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import model.Product;
 import dao.ProductDao;
+import logic.User;
+import util.AppUI;
 
 public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
+    private User currentUser;
 
     /**
      * Creates new form MANAGE_PRODUCT_DASH
      */
     public MANAGE_PRODUCT_DASH() {
+        this(null);
+    }
+    
+    public MANAGE_PRODUCT_DASH(User user) {
+        this.currentUser = user;
         initComponents();
+        AppUI.setupFrame(this, "Coffee Shop POS - Manage Products", true);
+        AppUI.styleTable(productTable);
+        AppUI.setPlaceholder(txtName, "e.g. Cappuccino");
+        AppUI.setPlaceholder(txtCategory, "e.g. Hot Coffee");
+        AppUI.setPlaceholder(txtPrice, "e.g. 4.50");
+        AppUI.setPlaceholder(txtStock, "e.g. 100");
+        AppUI.makeSecondary(btnBack);
+        AppUI.makeSecondary(btnDelete);
+        AppUI.makeSecondary(btnUpdate);
+        AppUI.makePrimary(btnAdd);
+        AppUI.setupDefaultButton(this, btnAdd);
     }
 
     /**
@@ -259,7 +278,7 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
     }
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
-        new test_package.ADMIN_DASH(null).setVisible(true);
+        new test_package.ADMIN_DASH(currentUser).setVisible(true);
         this.dispose();
     }
 
@@ -267,34 +286,10 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MANAGE_PRODUCT_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MANAGE_PRODUCT_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MANAGE_PRODUCT_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MANAGE_PRODUCT_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MANAGE_PRODUCT_DASH().setVisible(true);
-            }
+        AppUI.initLookAndFeelOnce();
+        java.awt.EventQueue.invokeLater(() -> {
+            User demo = new User(0, "admin", User.Role.ADMIN);
+            new MANAGE_PRODUCT_DASH(demo).setVisible(true);
         });
     }
 

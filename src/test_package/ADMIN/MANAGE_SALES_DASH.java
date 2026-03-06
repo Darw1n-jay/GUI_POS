@@ -29,7 +29,8 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
                 tableModel.addRow(new Object[]{
                     s.id, 
                     s.cashierId, 
-                    String.format("%.2f", s.total),
+                    String.format("₱%.2f", s.total),
+                    s.paymentMethod != null ? s.paymentMethod : "Cash",
                     sdf.format(s.saleDate)
                 });
             }
@@ -57,16 +58,16 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
 
         salesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {},
-            new String [] {"Sale ID", "Cashier ID", "Total", "Date"}
+            new String [] {"Sale ID", "Cashier ID", "Total", "Payment Method", "Date"}
         ) {
-            boolean[] canEdit = new boolean [] {false, false, false, false};
+            boolean[] canEdit = new boolean [] {false, false, false, false, false};
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
         jScrollPane1.setViewportView(salesTable);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 100, 750, 300));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 850, 280));
 
         btnViewDetails.setBackground(new java.awt.Color(0, 0, 0));
         btnViewDetails.setFont(new java.awt.Font("Sitka Display", 1, 14));
@@ -77,7 +78,7 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
                 btnViewDetailsActionPerformed(evt);
             }
         });
-        jPanel1.add(btnViewDetails, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 430, 140, 35));
+        jPanel1.add(btnViewDetails, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 140, 35));
 
         btnRefresh.setBackground(new java.awt.Color(0, 0, 0));
         btnRefresh.setFont(new java.awt.Font("Sitka Display", 1, 14));
@@ -88,7 +89,7 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
                 btnRefreshActionPerformed(evt);
             }
         });
-        jPanel1.add(btnRefresh, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 430, 120, 35));
+        jPanel1.add(btnRefresh, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 400, 120, 35));
 
         btnBack.setBackground(new java.awt.Color(0, 0, 0));
         btnBack.setFont(new java.awt.Font("Sitka Display", 1, 14));
@@ -99,7 +100,7 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
                 btnBackActionPerformed(evt);
             }
         });
-        jPanel1.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 430, 120, 35));
+        jPanel1.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 400, 120, 35));
 
         jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 24));
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -133,16 +134,38 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
             }
             
             int saleId = (int) salesTable.getValueAt(row, 0);
+            Sale sale = SaleDao.getSaleById(saleId);
             List<SaleItem> items = SaleDao.getSaleItems(saleId);
             
-            StringBuilder details = new StringBuilder("Sale Items:\n\n");
+            StringBuilder details = new StringBuilder();
+            details.append("=== SALE DETAILS ===\n\n");
+            details.append("Sale ID: ").append(sale.id).append("\n");
+            details.append("Cashier ID: ").append(sale.cashierId).append("\n");
+            details.append("Payment Method: ").append(sale.paymentMethod != null ? sale.paymentMethod : "Cash").append("\n");
+            details.append("Total: ₱").append(String.format("%.2f", sale.total)).append("\n");
+            details.append("Date: ").append(sale.saleDate).append("\n\n");
+            
+            details.append("=== ITEMS ===\n\n");
+            double totalCheck = 0.0;
             for (SaleItem item : items) {
                 Product product = ProductDao.getProductById(item.productId);
-                details.append(String.format("Product: %s\nQty: %d\nPrice: %.2f\nSubtotal: %.2f\n\n",
-                    product.name, item.qty, item.price, item.qty * item.price));
+                double subtotal = item.qty * item.price;
+                totalCheck += subtotal;
+                details.append(String.format("• %s\n", product.name));
+                details.append(String.format("  Qty: %d × ₱%.2f = ₱%.2f\n\n", 
+                    item.qty, item.price, subtotal));
             }
             
-            JOptionPane.showMessageDialog(this, details.toString(), "Sale Details", JOptionPane.INFORMATION_MESSAGE);
+            details.append("===================\n");
+            details.append(String.format("Total: ₱%.2f", totalCheck));
+            
+            JTextArea textArea = new JTextArea(details.toString());
+            textArea.setEditable(false);
+            textArea.setFont(new java.awt.Font("Monospaced", 0, 12));
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new java.awt.Dimension(400, 350));
+            
+            JOptionPane.showMessageDialog(this, scrollPane, "Sale Details - #" + saleId, JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }

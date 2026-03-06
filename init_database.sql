@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS sales (
     cashier_id INTEGER NOT NULL,
     total REAL NOT NULL,
     sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_method TEXT DEFAULT 'Cash',
     FOREIGN KEY (cashier_id) REFERENCES users(id)
 );
 

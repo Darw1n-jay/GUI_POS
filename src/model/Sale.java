@@ -7,6 +7,7 @@ public class Sale {
     public int cashierId;
     public double total;
     public Timestamp saleDate;
+    public String paymentMethod;
     
     public Sale() {}
     
@@ -15,5 +16,13 @@ public class Sale {
         this.cashierId = cashierId;
         this.total = total;
         this.saleDate = saleDate;
+    }
+    
+    public Sale(int id, int cashierId, double total, Timestamp saleDate, String paymentMethod) {
+        this.id = id;
+        this.cashierId = cashierId;
+        this.total = total;
+        this.saleDate = saleDate;
+        this.paymentMethod = paymentMethod;
     }
 }

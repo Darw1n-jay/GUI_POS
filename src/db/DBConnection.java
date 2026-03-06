@@ -4,23 +4,40 @@ import java.sql.*;
 
 public class DBConnection {
     private static final String DB_URL = "jdbc:sqlite:pos.db";
-    private static Connection connection = null;
+    private static boolean initialized = false;
     
     public static Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            try {
-                Class.forName("org.sqlite.JDBC");
-                connection = DriverManager.getConnection(DB_URL);
-                createTables();
-                insertDefaultAdmin();
-            } catch (ClassNotFoundException e) {
-                throw new SQLException("SQLite JDBC driver not found!", e);
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Connection conn = DriverManager.getConnection(DB_URL);
+            
+            // Enable WAL mode for better concurrency
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("PRAGMA journal_mode=WAL");
+                stmt.execute("PRAGMA synchronous=NORMAL");
+                stmt.execute("PRAGMA cache_size=10000");
+                stmt.execute("PRAGMA temp_store=memory");
+                stmt.execute("PRAGMA busy_timeout=30000");
             }
+            
+            // Initialize database only once
+            if (!initialized) {
+                synchronized (DBConnection.class) {
+                    if (!initialized) {
+                        createTables(conn);
+                        insertDefaultAdmin(conn);
+                        initialized = true;
+                    }
+                }
+            }
+            
+            return conn;
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("SQLite JDBC driver not found!", e);
         }
-        return connection;
     }
     
-    private static void createTables() {
+    private static void createTables(Connection connection) {
         String[] tables = {
             "CREATE TABLE IF NOT EXISTS users ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -43,6 +60,7 @@ public class DBConnection {
                 + "cashier_id INTEGER NOT NULL,"
                 + "total REAL NOT NULL,"
                 + "sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                + "payment_method TEXT DEFAULT 'Cash',"
                 + "FOREIGN KEY (cashier_id) REFERENCES users(id)"
                 + ")",
                 
@@ -70,13 +88,21 @@ public class DBConnection {
                 // Column already exists, ignore
             }
             
+            // Add payment_method column if it doesn't exist (for existing databases)
+            try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN payment_method TEXT DEFAULT 'Cash'");
+                System.out.println("✓ Added payment_method column to sales table");
+            } catch (SQLException e) {
+                // Column already exists, ignore
+            }
+            
             System.out.println("✓ Database tables created successfully");
         } catch (SQLException e) {
             System.err.println("Error creating tables: " + e.getMessage());
         }
     }
     
-    private static void insertDefaultAdmin() {
+    private static void insertDefaultAdmin(Connection connection) {
         try {
             Statement stmt = connection.createStatement();
             
@@ -101,7 +127,7 @@ public class DBConnection {
             int productCount = rs.getInt(1);
             
             if (productCount == 0) {
-                insertSampleProducts(stmt);
+                insertSampleProducts(connection);
             }
             
         } catch (SQLException e) {
@@ -109,8 +135,10 @@ public class DBConnection {
         }
     }
     
-    private static void insertSampleProducts(Statement stmt) throws SQLException {
+    private static void insertSampleProducts(Connection connection) throws SQLException {
         System.out.println("✓ Inserting coffee shop products...");
+        
+        try (Statement stmt = connection.createStatement()) {
         
         String[] products = {
             // Hot Coffee
@@ -220,12 +248,12 @@ public class DBConnection {
         }
         
         System.out.println("✓ Inserted " + products.length + " coffee shop products across 8 categories");
+        }
     }
     
     public static void initialize() {
-        try {
-            getConnection();
-            System.out.println("✓ POS System database initialized");
+        try (Connection conn = getConnection()) {
+            System.out.println("✓ Coffee Shop POS database initialized");
         } catch (SQLException e) {
             System.err.println("✗ Database initialization failed: " + e.getMessage());
             e.printStackTrace();
@@ -233,13 +261,28 @@ public class DBConnection {
     }
     
     public static void closeConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("✓ Database connection closed");
+        // No longer needed since we're not using singleton connections
+        System.out.println("✓ Using connection-per-operation pattern - no global connection to close");
+    }
+    
+    // Method for handling transactions
+    public static void executeTransaction(TransactionCallback callback) throws SQLException {
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                callback.execute(conn);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw new SQLException("Transaction failed: " + e.getMessage(), e);
+            } finally {
+                conn.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            System.err.println("Error closing connection: " + e.getMessage());
         }
+    }
+    
+    @FunctionalInterface
+    public interface TransactionCallback {
+        void execute(Connection conn) throws Exception;
     }
 }

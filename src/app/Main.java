@@ -1,20 +1,15 @@
 package app;
 import test_package.LOG_IN;
-import com.formdev.flatlaf.FlatLightLaf;
-import javax.swing.UIManager;
 import db.DBConnection;
+import util.AppUI;
 
 public class Main {
     public static void main(String[] args) {
         // Initialize database
         DBConnection.initialize();
         
-        // Set look and feel
-        try { 
-            UIManager.setLookAndFeel(new FlatLightLaf()); 
-        } catch (Exception e) {
-            System.err.println("Failed to set look and feel: " + e.getMessage());
-        }
+        // Set look and feel (FlatLaf)
+        AppUI.initLookAndFeelOnce();
 
         // Launch login screen
         java.awt.EventQueue.invokeLater(() -> {

@@ -7,8 +7,9 @@
 package test_package;
 
 
-         import javax.swing.*;
-         import logic.User;
+import javax.swing.*;
+import logic.User;
+import util.AppUI;
 
          public class CASHIER_DASH extends javax.swing.JFrame {
              private User currentUser;
@@ -19,6 +20,14 @@ package test_package;
 
     // optional: show username somewhere 
     // lblUsername.setText(user.username);
+    AppUI.setupFrame(this, "Coffee Shop POS - Cashier Dashboard", true);
+    AppUI.makeSecondary(jButton1);
+    AppUI.makeSecondary(jButton2);
+    AppUI.makeSecondary(jButton3);
+    AppUI.makeSecondary(jButton4);
+    if (user != null && user.username != null) {
+        jLabel1.setText("WELCOME, " + user.username.toUpperCase() + " (CASHIER)");
+    }
       }
 
     @SuppressWarnings("unchecked")
@@ -62,7 +71,7 @@ package test_package;
         jButton3.setBackground(new java.awt.Color(0, 0, 0));
         jButton3.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("LIST OF MY PRODUCT");
+        jButton3.setText("MY COFFEE PRODUCTS");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -133,36 +142,10 @@ package test_package;
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CASHIER_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CASHIER_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CASHIER_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CASHIER_DASH.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                User user = null;
-                new CASHIER_DASH(user).setVisible(true);
-
-            }
+        AppUI.initLookAndFeelOnce();
+        java.awt.EventQueue.invokeLater(() -> {
+            User demo = new User(0, "cashier", User.Role.CASHIER);
+            new CASHIER_DASH(demo).setVisible(true);
         });
     }
 
