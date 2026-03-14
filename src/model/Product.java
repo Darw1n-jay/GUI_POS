@@ -6,6 +6,7 @@ public class Product {
     public String category;
     public double price;
     public int stock;
+    public boolean isAvailable = true;
     
     public Product() {}
     
@@ -15,5 +16,6 @@ public class Product {
         this.category = category;
         this.price = price;
         this.stock = stock;
+        this.isAvailable = true;
     }
 }

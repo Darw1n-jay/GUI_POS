@@ -162,7 +162,7 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
         });
         jPanel1.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 450, 100, 30));
 
-        lblTotal.setFont(new java.awt.Font("Sitka Display", 1, 18));
+        lblTotal.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
         lblTotal.setForeground(new java.awt.Color(255, 255, 255));
         lblTotal.setText("Total: ₱0.00");
         jPanel1.add(lblTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 340, 200, 30));
@@ -255,7 +255,29 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
             if (selectedPayment == null) {
                 return; // User cancelled
             }
-            
+
+            // Ask for amount tendered
+            double amountPaid = 0.0;
+            while (true) {
+                String input = JOptionPane.showInputDialog(this,
+                    String.format("Total: ₱%.2f\nEnter amount paid by customer:", totalAmount),
+                    "Amount Tendered", JOptionPane.PLAIN_MESSAGE);
+                if (input == null) return; // cancelled
+                try {
+                    amountPaid = Double.parseDouble(input.trim());
+                    if (amountPaid < totalAmount) {
+                        JOptionPane.showMessageDialog(this,
+                            String.format("Insufficient amount!\nTotal: ₱%.2f\nPaid: ₱%.2f", totalAmount, amountPaid),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        break;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Please enter a valid amount.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            double change = amountPaid - totalAmount;
+
             int saleId = SaleDao.createSale(currentUser.id, totalAmount, selectedPayment);
             
             for (int i = 0; i < cartModel.getRowCount(); i++) {
@@ -269,8 +291,13 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
                 ProductDao.updateStock(productId, product.stock - qty);
             }
             
-            // Generate and show receipt
+            // Generate and show receipt with change
             String receipt = util.ReceiptPrinter.generateReceipt(saleId);
+            String changeInfo = String.format("\nAmount Paid:  ₱%9.2f\nChange:       ₱%9.2f\n", amountPaid, change);
+            // Insert change info before the thank-you line
+            receipt = receipt.replace("       Thank you for your purchase!",
+                changeInfo + "       Thank you for your purchase!");
+
             JTextArea textArea = new JTextArea(receipt);
             textArea.setEditable(false);
             textArea.setFont(new java.awt.Font("Monospaced", 0, 12));

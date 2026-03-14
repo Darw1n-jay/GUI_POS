@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Date;
 import java.util.ArrayList;
+import java.io.*;
+import javax.swing.JOptionPane;
 
 public class ReceiptPrinter {
     
@@ -135,6 +137,27 @@ public class ReceiptPrinter {
         }
     }
     
+    // Opens the receipt in Notepad for printing
+    public static void printToNotepad(int saleId) {
+        String receipt = generateReceipt(saleId);
+        try {
+            File tempFile = File.createTempFile("receipt_" + saleId + "_", ".txt");
+            tempFile.deleteOnExit();
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+                writer.write(receipt);
+            }
+
+            // Open in Notepad
+            Runtime.getRuntime().exec(new String[]{"notepad.exe", tempFile.getAbsolutePath()});
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null,
+                "Failed to open receipt in Notepad:\n" + e.getMessage(),
+                "Print Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     // Helper method to get a single sale by ID more efficiently
     private static Sale getSaleById(int saleId) throws Exception {
         return SaleDao.getSaleById(saleId);

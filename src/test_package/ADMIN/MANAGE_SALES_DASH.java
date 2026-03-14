@@ -16,7 +16,30 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
         initComponents();
         loadSales();
     }
-    
+
+    private void searchBySaleId() {
+        String text = txtSearchId.getText().trim();
+        DefaultTableModel model = (DefaultTableModel) salesTable.getModel();
+        model.setRowCount(0);
+        try {
+            List<Sale> sales = SaleDao.getAllSales();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            for (Sale s : sales) {
+                if (text.isEmpty() || String.valueOf(s.id).contains(text)) {
+                    model.addRow(new Object[]{
+                        s.id,
+                        s.cashierId,
+                        String.format("₱%.2f", s.total),
+                        s.paymentMethod != null ? s.paymentMethod : "Cash",
+                        sdf.format(s.saleDate)
+                    });
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error searching: " + e.getMessage());
+        }
+    }
+
     private void loadSales() {
         try {
             DefaultTableModel tableModel = (DefaultTableModel) salesTable.getModel();
@@ -51,6 +74,9 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
         btnBack = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        txtSearchId = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        lblSearch = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,6 +94,22 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
         jScrollPane1.setViewportView(salesTable);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 850, 280));
+
+        // Search bar
+        lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 14));
+        lblSearch.setForeground(new java.awt.Color(255, 255, 255));
+        lblSearch.setText("Search Sale ID:");
+        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 65, 130, 30));
+
+        txtSearchId.setFont(new java.awt.Font("Sitka Display", 0, 14));
+        jPanel1.add(txtSearchId, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 65, 150, 30));
+
+        btnSearch.setBackground(new java.awt.Color(0, 0, 0));
+        btnSearch.setFont(new java.awt.Font("Sitka Display", 1, 13));
+        btnSearch.setForeground(new java.awt.Color(255, 255, 255));
+        btnSearch.setText("SEARCH");
+        btnSearch.addActionListener(evt -> searchBySaleId());
+        jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(345, 65, 100, 30));
 
         btnViewDetails.setBackground(new java.awt.Color(0, 0, 0));
         btnViewDetails.setFont(new java.awt.Font("Sitka Display", 1, 14));
@@ -202,11 +244,14 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnViewDetails;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lblSearch;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable salesTable;
+    private javax.swing.JTextField txtSearchId;
     // End of variables declaration//GEN-END:variables
 }

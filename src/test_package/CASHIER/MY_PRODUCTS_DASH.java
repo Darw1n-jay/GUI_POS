@@ -20,10 +20,9 @@ public class MY_PRODUCTS_DASH extends javax.swing.JFrame {
         try {
             DefaultTableModel tableModel = (DefaultTableModel) productTable.getModel();
             tableModel.setRowCount(0);
-            
-            List<Product> products = ProductDao.getAllProducts();
+            List<Product> products = ProductDao.getAvailableProducts();
             for (Product p : products) {
-                tableModel.addRow(new Object[]{p.id, p.name, p.price, p.stock});
+                tableModel.addRow(new Object[]{p.id, p.name, p.category, p.price, p.stock, "Available"});
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage());
@@ -48,9 +47,9 @@ public class MY_PRODUCTS_DASH extends javax.swing.JFrame {
 
         productTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {},
-            new String [] {"ID", "Product Name", "Price", "Stock"}
+            new String [] {"ID", "Product Name", "Category", "Price", "Stock", "Status"}
         ) {
-            boolean[] canEdit = new boolean [] {false, false, false, false};
+            boolean[] canEdit = new boolean [] {false, false, false, false, false, false};
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }

@@ -39,6 +39,19 @@ public class DBConnection {
     
     private static void createTables(Connection connection) {
         String[] tables = {
+            // Lookup: categories
+            "CREATE TABLE IF NOT EXISTS categories ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name TEXT UNIQUE NOT NULL"
+                + ")",
+
+            // Lookup: payment_methods
+            "CREATE TABLE IF NOT EXISTS payment_methods ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name TEXT UNIQUE NOT NULL"
+                + ")",
+
+            // Users
             "CREATE TABLE IF NOT EXISTS users ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "username TEXT UNIQUE NOT NULL,"
@@ -46,24 +59,29 @@ public class DBConnection {
                 + "role TEXT CHECK(role IN ('ADMIN', 'CASHIER')) DEFAULT 'CASHIER',"
                 + "approved INTEGER DEFAULT 0"
                 + ")",
-                
+
+            // Products — category_id FK to categories
             "CREATE TABLE IF NOT EXISTS products ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "name TEXT NOT NULL,"
-                + "category TEXT,"
+                + "category_id INTEGER,"
                 + "price REAL NOT NULL,"
-                + "stock INTEGER DEFAULT 0"
+                + "stock INTEGER DEFAULT 0,"
+                + "FOREIGN KEY (category_id) REFERENCES categories(id)"
                 + ")",
-                
+
+            // Sales — payment_method_id FK to payment_methods
             "CREATE TABLE IF NOT EXISTS sales ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "cashier_id INTEGER NOT NULL,"
                 + "total REAL NOT NULL,"
                 + "sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + "payment_method TEXT DEFAULT 'Cash',"
-                + "FOREIGN KEY (cashier_id) REFERENCES users(id)"
+                + "payment_method_id INTEGER,"
+                + "FOREIGN KEY (cashier_id) REFERENCES users(id),"
+                + "FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id)"
                 + ")",
-                
+
+            // Sale Items
             "CREATE TABLE IF NOT EXISTS sale_items ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "sale_id INTEGER NOT NULL,"
@@ -72,31 +90,85 @@ public class DBConnection {
                 + "price REAL NOT NULL,"
                 + "FOREIGN KEY (sale_id) REFERENCES sales(id),"
                 + "FOREIGN KEY (product_id) REFERENCES products(id)"
+                + ")",
+
+            // Archived Products
+            "CREATE TABLE IF NOT EXISTS archived_products ("
+                + "id INTEGER PRIMARY KEY,"
+                + "name TEXT NOT NULL,"
+                + "category_id INTEGER,"
+                + "price REAL NOT NULL,"
+                + "stock INTEGER DEFAULT 0,"
+                + "archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                + "FOREIGN KEY (category_id) REFERENCES categories(id)"
+                + ")",
+
+            // Archived Users
+            "CREATE TABLE IF NOT EXISTS archived_users ("
+                + "id INTEGER PRIMARY KEY,"
+                + "username TEXT NOT NULL,"
+                + "password TEXT NOT NULL,"
+                + "role TEXT NOT NULL,"
+                + "approved INTEGER DEFAULT 0,"
+                + "archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
                 + ")"
         };
-        
+
         try (Statement stmt = connection.createStatement()) {
             for (String table : tables) {
                 stmt.execute(table);
             }
-            
-            // Add category column if it doesn't exist (for existing databases)
+
+            // Seed payment_methods lookup
+            stmt.execute("INSERT OR IGNORE INTO payment_methods(name) VALUES ('Cash')");
+            stmt.execute("INSERT OR IGNORE INTO payment_methods(name) VALUES ('GCash')");
+
+            // Migrate old products.category text column → category_id if needed
             try {
-                stmt.execute("ALTER TABLE products ADD COLUMN category TEXT");
-                System.out.println("✓ Added category column to products table");
+                stmt.execute("ALTER TABLE products ADD COLUMN category_id INTEGER REFERENCES categories(id)");
+                // Migrate existing text values
+                stmt.execute(
+                    "INSERT OR IGNORE INTO categories(name) SELECT DISTINCT category FROM products WHERE category IS NOT NULL"
+                );
+                stmt.execute(
+                    "UPDATE products SET category_id = (SELECT id FROM categories WHERE categories.name = products.category)"
+                );
+                stmt.execute("ALTER TABLE products DROP COLUMN category");
             } catch (SQLException e) {
-                // Column already exists, ignore
+                // Already migrated or column doesn't exist
             }
-            
-            // Add payment_method column if it doesn't exist (for existing databases)
+
+            // Migrate old sales.payment_method text column → payment_method_id if needed
             try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN payment_method TEXT DEFAULT 'Cash'");
-                System.out.println("✓ Added payment_method column to sales table");
+                stmt.execute("ALTER TABLE sales ADD COLUMN payment_method_id INTEGER REFERENCES payment_methods(id)");
+                stmt.execute(
+                    "INSERT OR IGNORE INTO payment_methods(name) SELECT DISTINCT payment_method FROM sales WHERE payment_method IS NOT NULL"
+                );
+                stmt.execute(
+                    "UPDATE sales SET payment_method_id = (SELECT id FROM payment_methods WHERE payment_methods.name = sales.payment_method)"
+                );
+                stmt.execute("ALTER TABLE sales DROP COLUMN payment_method");
             } catch (SQLException e) {
-                // Column already exists, ignore
+                // Already migrated or column doesn't exist
             }
-            
-            System.out.println("✓ Database tables created successfully");
+
+            System.out.println("✓ Database tables created/normalized successfully");
+
+            // Add is_archived column to products if not exists
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN is_archived INTEGER DEFAULT 0");
+            } catch (SQLException e) { /* already exists */ }
+
+            // Add is_available column to products if not exists
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN is_available INTEGER DEFAULT 1");
+            } catch (SQLException e) { /* already exists */ }
+
+            // Add is_archived column to users if not exists
+            try {
+                stmt.execute("ALTER TABLE users ADD COLUMN is_archived INTEGER DEFAULT 0");
+            } catch (SQLException e) { /* already exists */ }
+
         } catch (SQLException e) {
             System.err.println("Error creating tables: " + e.getMessage());
         }
@@ -137,118 +209,121 @@ public class DBConnection {
     
     private static void insertSampleProducts(Connection connection) throws SQLException {
         System.out.println("✓ Inserting coffee shop products...");
-        
-        try (Statement stmt = connection.createStatement()) {
-        
-        String[] products = {
-            // Hot Coffee
-            "INSERT INTO products (name, category, price, stock) VALUES ('Espresso Single', 'Hot Coffee', 2.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Espresso Double', 'Hot Coffee', 3.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Americano', 'Hot Coffee', 3.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cappuccino', 'Hot Coffee', 4.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Latte', 'Hot Coffee', 4.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Flat White', 'Hot Coffee', 4.25, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Mocha', 'Hot Coffee', 4.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Macchiato', 'Hot Coffee', 3.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Caramel Latte', 'Hot Coffee', 5.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Vanilla Latte', 'Hot Coffee', 5.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Hazelnut Latte', 'Hot Coffee', 5.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Turkish Coffee', 'Hot Coffee', 3.50, 100)",
-            
-            // Iced Coffee
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Americano', 'Iced Coffee', 3.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Latte', 'Iced Coffee', 4.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Mocha', 'Iced Coffee', 5.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Caramel Macchiato', 'Iced Coffee', 5.25, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cold Brew', 'Iced Coffee', 4.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Vanilla Latte', 'Iced Coffee', 5.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Hazelnut Coffee', 'Iced Coffee', 5.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Frappe', 'Iced Coffee', 5.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Nitro Cold Brew', 'Iced Coffee', 5.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Cappuccino', 'Iced Coffee', 4.50, 100)",
-            
-            // Tea
-            "INSERT INTO products (name, category, price, stock) VALUES ('English Breakfast Tea', 'Tea', 2.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Earl Grey Tea', 'Tea', 2.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Green Tea', 'Tea', 2.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Chamomile Tea', 'Tea', 2.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Peppermint Tea', 'Tea', 2.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Chai Latte', 'Tea', 4.25, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Matcha Latte', 'Tea', 4.75, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Green Tea', 'Tea', 3.00, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Peach Tea', 'Tea', 3.50, 100)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Jasmine Tea', 'Tea', 2.75, 100)",
-            
-            // Pastries
-            "INSERT INTO products (name, category, price, stock) VALUES ('Croissant Plain', 'Pastries', 3.00, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Chocolate Croissant', 'Pastries', 3.50, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Almond Croissant', 'Pastries', 3.75, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Blueberry Muffin', 'Pastries', 3.25, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Chocolate Chip Muffin', 'Pastries', 3.25, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Banana Bread', 'Pastries', 3.50, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cinnamon Roll', 'Pastries', 4.00, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Danish Pastry', 'Pastries', 3.50, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Scone', 'Pastries', 3.00, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Donut Glazed', 'Pastries', 2.50, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Donut Chocolate', 'Pastries', 2.75, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Bagel Plain', 'Pastries', 2.50, 50)",
-            
-            // Cakes & Desserts
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cheesecake Slice', 'Cakes & Desserts', 5.50, 30)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Chocolate Cake Slice', 'Cakes & Desserts', 5.00, 30)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Carrot Cake Slice', 'Cakes & Desserts', 5.00, 30)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Red Velvet Cake Slice', 'Cakes & Desserts', 5.50, 30)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Tiramisu', 'Cakes & Desserts', 6.00, 30)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Brownie', 'Cakes & Desserts', 3.50, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cookie Chocolate Chip', 'Cakes & Desserts', 2.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cookie Oatmeal Raisin', 'Cakes & Desserts', 2.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Macaron Box (6pcs)', 'Cakes & Desserts', 8.00, 25)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cupcake Vanilla', 'Cakes & Desserts', 3.50, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Cupcake Chocolate', 'Cakes & Desserts', 3.50, 40)",
-            
-            // Sandwiches & Snacks
-            "INSERT INTO products (name, category, price, stock) VALUES ('Ham & Cheese Sandwich', 'Sandwiches & Snacks', 6.50, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Turkey Club Sandwich', 'Sandwiches & Snacks', 7.50, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Chicken Pesto Sandwich', 'Sandwiches & Snacks', 7.00, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Veggie Sandwich', 'Sandwiches & Snacks', 6.00, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('BLT Sandwich', 'Sandwiches & Snacks', 6.50, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Tuna Sandwich', 'Sandwiches & Snacks', 6.50, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Bagel with Cream Cheese', 'Sandwiches & Snacks', 4.00, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Bagel with Lox', 'Sandwiches & Snacks', 8.50, 30)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Granola Bar', 'Sandwiches & Snacks', 2.50, 80)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Protein Bar', 'Sandwiches & Snacks', 3.50, 80)",
-            
-            // Smoothies & Juices
-            "INSERT INTO products (name, category, price, stock) VALUES ('Strawberry Banana Smoothie', 'Smoothies & Juices', 5.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Mango Smoothie', 'Smoothies & Juices', 5.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Berry Blast Smoothie', 'Smoothies & Juices', 5.75, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Green Detox Smoothie', 'Smoothies & Juices', 6.00, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Protein Smoothie', 'Smoothies & Juices', 6.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Orange Juice Fresh', 'Smoothies & Juices', 4.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Apple Juice', 'Smoothies & Juices', 3.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Carrot Juice', 'Smoothies & Juices', 4.00, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Lemonade Fresh', 'Smoothies & Juices', 3.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Tea Lemon', 'Smoothies & Juices', 3.00, 60)",
-            
-            // Specialty Drinks
-            "INSERT INTO products (name, category, price, stock) VALUES ('Hot Chocolate', 'Specialty Drinks', 4.00, 80)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('White Hot Chocolate', 'Specialty Drinks', 4.25, 80)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Iced Chocolate', 'Specialty Drinks', 4.50, 80)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Affogato', 'Specialty Drinks', 5.50, 50)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Irish Coffee', 'Specialty Drinks', 7.00, 40)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Caramel Frappuccino', 'Specialty Drinks', 5.75, 70)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Mocha Frappuccino', 'Specialty Drinks', 5.75, 70)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Vanilla Frappuccino', 'Specialty Drinks', 5.75, 70)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Pumpkin Spice Latte', 'Specialty Drinks', 5.50, 60)",
-            "INSERT INTO products (name, category, price, stock) VALUES ('Gingerbread Latte', 'Specialty Drinks', 5.50, 60)"
+
+        // Ensure categories exist and get their IDs
+        String[] categoryNames = {
+            "Hot Coffee", "Iced Coffee", "Tea", "Pastries",
+            "Cakes & Desserts", "Sandwiches & Snacks", "Smoothies & Juices", "Specialty Drinks"
         };
-        
-        for (String product : products) {
-            stmt.execute(product);
+        try (PreparedStatement ps = connection.prepareStatement(
+                "INSERT OR IGNORE INTO categories(name) VALUES (?)")) {
+            for (String cat : categoryNames) {
+                ps.setString(1, cat);
+                ps.executeUpdate();
+            }
         }
-        
-        System.out.println("✓ Inserted " + products.length + " coffee shop products across 8 categories");
+
+        String[][] products = {
+            // {name, category, price, stock}
+            {"Espresso Single","Hot Coffee","2.50","100"},
+            {"Espresso Double","Hot Coffee","3.50","100"},
+            {"Americano","Hot Coffee","3.00","100"},
+            {"Cappuccino","Hot Coffee","4.00","100"},
+            {"Latte","Hot Coffee","4.50","100"},
+            {"Flat White","Hot Coffee","4.25","100"},
+            {"Mocha","Hot Coffee","4.75","100"},
+            {"Macchiato","Hot Coffee","3.75","100"},
+            {"Caramel Latte","Hot Coffee","5.00","100"},
+            {"Vanilla Latte","Hot Coffee","5.00","100"},
+            {"Hazelnut Latte","Hot Coffee","5.00","100"},
+            {"Turkish Coffee","Hot Coffee","3.50","100"},
+            {"Iced Americano","Iced Coffee","3.50","100"},
+            {"Iced Latte","Iced Coffee","4.75","100"},
+            {"Iced Mocha","Iced Coffee","5.00","100"},
+            {"Iced Caramel Macchiato","Iced Coffee","5.25","100"},
+            {"Cold Brew","Iced Coffee","4.50","100"},
+            {"Iced Vanilla Latte","Iced Coffee","5.00","100"},
+            {"Iced Hazelnut Coffee","Iced Coffee","5.00","100"},
+            {"Frappe","Iced Coffee","5.50","100"},
+            {"Nitro Cold Brew","Iced Coffee","5.75","100"},
+            {"Iced Cappuccino","Iced Coffee","4.50","100"},
+            {"English Breakfast Tea","Tea","2.50","100"},
+            {"Earl Grey Tea","Tea","2.50","100"},
+            {"Green Tea","Tea","2.75","100"},
+            {"Chamomile Tea","Tea","2.75","100"},
+            {"Peppermint Tea","Tea","2.75","100"},
+            {"Chai Latte","Tea","4.25","100"},
+            {"Matcha Latte","Tea","4.75","100"},
+            {"Iced Green Tea","Tea","3.00","100"},
+            {"Iced Peach Tea","Tea","3.50","100"},
+            {"Jasmine Tea","Tea","2.75","100"},
+            {"Croissant Plain","Pastries","3.00","50"},
+            {"Chocolate Croissant","Pastries","3.50","50"},
+            {"Almond Croissant","Pastries","3.75","50"},
+            {"Blueberry Muffin","Pastries","3.25","50"},
+            {"Chocolate Chip Muffin","Pastries","3.25","50"},
+            {"Banana Bread","Pastries","3.50","50"},
+            {"Cinnamon Roll","Pastries","4.00","50"},
+            {"Danish Pastry","Pastries","3.50","50"},
+            {"Scone","Pastries","3.00","50"},
+            {"Donut Glazed","Pastries","2.50","50"},
+            {"Donut Chocolate","Pastries","2.75","50"},
+            {"Bagel Plain","Pastries","2.50","50"},
+            {"Cheesecake Slice","Cakes & Desserts","5.50","30"},
+            {"Chocolate Cake Slice","Cakes & Desserts","5.00","30"},
+            {"Carrot Cake Slice","Cakes & Desserts","5.00","30"},
+            {"Red Velvet Cake Slice","Cakes & Desserts","5.50","30"},
+            {"Tiramisu","Cakes & Desserts","6.00","30"},
+            {"Brownie","Cakes & Desserts","3.50","40"},
+            {"Cookie Chocolate Chip","Cakes & Desserts","2.50","60"},
+            {"Cookie Oatmeal Raisin","Cakes & Desserts","2.50","60"},
+            {"Macaron Box (6pcs)","Cakes & Desserts","8.00","25"},
+            {"Cupcake Vanilla","Cakes & Desserts","3.50","40"},
+            {"Cupcake Chocolate","Cakes & Desserts","3.50","40"},
+            {"Ham & Cheese Sandwich","Sandwiches & Snacks","6.50","40"},
+            {"Turkey Club Sandwich","Sandwiches & Snacks","7.50","40"},
+            {"Chicken Pesto Sandwich","Sandwiches & Snacks","7.00","40"},
+            {"Veggie Sandwich","Sandwiches & Snacks","6.00","40"},
+            {"BLT Sandwich","Sandwiches & Snacks","6.50","40"},
+            {"Tuna Sandwich","Sandwiches & Snacks","6.50","40"},
+            {"Bagel with Cream Cheese","Sandwiches & Snacks","4.00","50"},
+            {"Bagel with Lox","Sandwiches & Snacks","8.50","30"},
+            {"Granola Bar","Sandwiches & Snacks","2.50","80"},
+            {"Protein Bar","Sandwiches & Snacks","3.50","80"},
+            {"Strawberry Banana Smoothie","Smoothies & Juices","5.50","60"},
+            {"Mango Smoothie","Smoothies & Juices","5.50","60"},
+            {"Berry Blast Smoothie","Smoothies & Juices","5.75","60"},
+            {"Green Detox Smoothie","Smoothies & Juices","6.00","60"},
+            {"Protein Smoothie","Smoothies & Juices","6.50","60"},
+            {"Orange Juice Fresh","Smoothies & Juices","4.50","60"},
+            {"Apple Juice","Smoothies & Juices","3.50","60"},
+            {"Carrot Juice","Smoothies & Juices","4.00","60"},
+            {"Lemonade Fresh","Smoothies & Juices","3.50","60"},
+            {"Iced Tea Lemon","Smoothies & Juices","3.00","60"},
+            {"Hot Chocolate","Specialty Drinks","4.00","80"},
+            {"White Hot Chocolate","Specialty Drinks","4.25","80"},
+            {"Iced Chocolate","Specialty Drinks","4.50","80"},
+            {"Affogato","Specialty Drinks","5.50","50"},
+            {"Irish Coffee","Specialty Drinks","7.00","40"},
+            {"Caramel Frappuccino","Specialty Drinks","5.75","70"},
+            {"Mocha Frappuccino","Specialty Drinks","5.75","70"},
+            {"Vanilla Frappuccino","Specialty Drinks","5.75","70"},
+            {"Pumpkin Spice Latte","Specialty Drinks","5.50","60"},
+            {"Gingerbread Latte","Specialty Drinks","5.50","60"}
+        };
+
+        String sql = "INSERT INTO products(name, category_id, price, stock) "
+                   + "VALUES(?, (SELECT id FROM categories WHERE name=?), ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (String[] p : products) {
+                ps.setString(1, p[0]);
+                ps.setString(2, p[1]);
+                ps.setDouble(3, Double.parseDouble(p[2]));
+                ps.setInt(4, Integer.parseInt(p[3]));
+                ps.executeUpdate();
+            }
         }
+        System.out.println("✓ Inserted " + products.length + " products across 8 categories");
     }
     
     public static void initialize() {

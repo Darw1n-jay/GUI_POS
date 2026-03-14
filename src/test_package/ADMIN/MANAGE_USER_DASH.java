@@ -12,7 +12,23 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
         initComponents();
         loadUsers();
     }
-    
+
+    private void searchById() {
+        String text = txtSearchId.getText().trim();
+        DefaultTableModel tableModel = (DefaultTableModel) userTable.getModel();
+        tableModel.setRowCount(0);
+        try {
+            List<User> users = UserDao.getAllUsers();
+            for (User u : users) {
+                if (text.isEmpty() || String.valueOf(u.id).contains(text)) {
+                    tableModel.addRow(new Object[]{u.id, u.username, u.role});
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }
+
     private void loadUsers() {
         try {
             DefaultTableModel tableModel = (DefaultTableModel) userTable.getModel();
@@ -39,6 +55,9 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
         btnBack = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        txtSearchId = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        lblSearch = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -57,10 +76,26 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 100, 750, 300));
 
+        // Search bar
+        lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 14));
+        lblSearch.setForeground(new java.awt.Color(255, 255, 255));
+        lblSearch.setText("Search User ID:");
+        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 65, 130, 30));
+
+        txtSearchId.setFont(new java.awt.Font("Sitka Display", 0, 14));
+        jPanel1.add(txtSearchId, new org.netbeans.lib.awtextra.AbsoluteConstraints(235, 65, 150, 30));
+
+        btnSearch.setBackground(new java.awt.Color(0, 0, 0));
+        btnSearch.setFont(new java.awt.Font("Sitka Display", 1, 13));
+        btnSearch.setForeground(new java.awt.Color(255, 255, 255));
+        btnSearch.setText("SEARCH");
+        btnSearch.addActionListener(evt -> searchById());
+        jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(395, 65, 100, 30));
+
         btnDelete.setBackground(new java.awt.Color(0, 0, 0));
         btnDelete.setFont(new java.awt.Font("Sitka Display", 1, 14));
         btnDelete.setForeground(new java.awt.Color(255, 255, 255));
-        btnDelete.setText("DELETE USER");
+        btnDelete.setText("ARCHIVE USER");
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
@@ -117,7 +152,7 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
         try {
             int row = userTable.getSelectedRow();
             if (row == -1) {
-                JOptionPane.showMessageDialog(this, "Please select a user to delete");
+                JOptionPane.showMessageDialog(this, "Please select a user to archive");
                 return;
             }
             
@@ -125,14 +160,14 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
             String username = (String) userTable.getValueAt(row, 1);
             
             if (username.equals("admin")) {
-                JOptionPane.showMessageDialog(this, "Cannot delete admin user!");
+                JOptionPane.showMessageDialog(this, "Cannot archive admin user!");
                 return;
             }
             
-            int confirm = JOptionPane.showConfirmDialog(this, "Delete user: " + username + "?");
+            int confirm = JOptionPane.showConfirmDialog(this, "Archive user: " + username + "?");
             if (confirm == JOptionPane.YES_OPTION) {
                 UserDao.deleteUser(id);
-                JOptionPane.showMessageDialog(this, "User deleted successfully!");
+                JOptionPane.showMessageDialog(this, "User archived successfully!");
                 loadUsers();
             }
         } catch (Exception e) {
@@ -172,10 +207,13 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lblSearch;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable userTable;
+    private javax.swing.JTextField txtSearchId;
     // End of variables declaration//GEN-END:variables
 }

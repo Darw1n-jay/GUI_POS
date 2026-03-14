@@ -13,7 +13,23 @@ public class LOW_STOCK_DASH extends javax.swing.JFrame {
         initComponents();
         loadLowStock();
     }
-    
+
+    private void searchById() {
+        String text = txtSearchId.getText().trim();
+        DefaultTableModel tableModel = (DefaultTableModel) stockTable.getModel();
+        tableModel.setRowCount(0);
+        try {
+            List<Product> products = ProductDao.getAllProducts();
+            for (Product p : products) {
+                if (p.stock <= threshold && (text.isEmpty() || String.valueOf(p.id).contains(text))) {
+                    tableModel.addRow(new Object[]{p.id, p.name, p.price, p.stock});
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }
+
     private void loadLowStock() {
         try {
             DefaultTableModel tableModel = (DefaultTableModel) stockTable.getModel();
@@ -51,6 +67,9 @@ public class LOW_STOCK_DASH extends javax.swing.JFrame {
         btnBack = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        txtSearchId = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        lblSearch = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,6 +87,22 @@ public class LOW_STOCK_DASH extends javax.swing.JFrame {
         jScrollPane1.setViewportView(stockTable);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 100, 750, 250));
+
+        // Search bar
+        lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 14));
+        lblSearch.setForeground(new java.awt.Color(255, 255, 255));
+        lblSearch.setText("Search Product ID:");
+        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 65, 155, 30));
+
+        txtSearchId.setFont(new java.awt.Font("Sitka Display", 0, 14));
+        jPanel1.add(txtSearchId, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 65, 150, 30));
+
+        btnSearch.setBackground(new java.awt.Color(0, 0, 0));
+        btnSearch.setFont(new java.awt.Font("Sitka Display", 1, 13));
+        btnSearch.setForeground(new java.awt.Color(255, 255, 255));
+        btnSearch.setText("SEARCH");
+        btnSearch.addActionListener(evt -> searchById());
+        jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 65, 100, 30));
 
         lblLowStockCount.setFont(new java.awt.Font("Sitka Display", 1, 16));
         lblLowStockCount.setForeground(new java.awt.Color(255, 255, 255));
@@ -179,14 +214,17 @@ public class LOW_STOCK_DASH extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnSetThreshold;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel lblLowStockCount;
+    private javax.swing.JLabel lblSearch;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblLowStockCount;
     private javax.swing.JTable stockTable;
     private javax.swing.JTextField txtThreshold;
+    private javax.swing.JTextField txtSearchId;
     // End of variables declaration//GEN-END:variables
 }

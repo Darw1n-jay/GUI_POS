@@ -37,6 +37,14 @@ import util.AppUI;
            // Hide APPROVE_REGISTER button since functionality is now combined in USER_MANAGEMENT
            APPROVE_REGISTER.setVisible(false);
            APPROVE_REGISTER.setEnabled(false);
+           // Search is now inside Manage Products
+           SEARCH_PRODUCT.setVisible(false);
+           SEARCH_PRODUCT.setEnabled(false);
+           // DASHBOARD_SUMMARY is now merged into REPORTS
+           DASHBOARD_SUMMARY.setVisible(false);
+           DASHBOARD_SUMMARY.setEnabled(false);
+           // Rename buttons
+           SALES_REPORT.setText("REPORTS");
            if (user != null && user.username != null) {
                jLabel1.setText("WELCOME, " + user.username.toUpperCase());
            }
@@ -66,131 +74,80 @@ import util.AppUI;
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        DASHBOARD_SUMMARY.setBackground(new java.awt.Color(0, 0, 0));
-        DASHBOARD_SUMMARY.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        DASHBOARD_SUMMARY.setForeground(new java.awt.Color(255, 255, 255));
-        DASHBOARD_SUMMARY.setText("OVERVIEW");
-        DASHBOARD_SUMMARY.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DASHBOARD_SUMMARYActionPerformed(evt);
-            }
-        });
-        jPanel1.add(DASHBOARD_SUMMARY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 50, 160, 40));
+        // shared style vars
+        java.awt.Font btnFont  = new java.awt.Font("Sitka Display", 1, 14);
+        java.awt.Color white   = new java.awt.Color(255, 255, 255);
+        java.awt.Color black   = new java.awt.Color(0, 0, 0);
+        int bx = 100, bw = 160, bh = 50, by = 50, gap = 60;
 
-        MANAGE_PRODUCT.setBackground(new java.awt.Color(0, 0, 0));
-        MANAGE_PRODUCT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        MANAGE_PRODUCT.setForeground(new java.awt.Color(255, 255, 255));
-        MANAGE_PRODUCT.setText("MANAGE COFFEE PRODUCTS");
-        MANAGE_PRODUCT.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MANAGE_PRODUCTActionPerformed(evt);
-            }
-        });
-        jPanel1.add(MANAGE_PRODUCT, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 100, 160, 40));
+        // 1. MANAGE PRODUCTS
+        MANAGE_PRODUCT.setBackground(black); MANAGE_PRODUCT.setFont(btnFont); MANAGE_PRODUCT.setForeground(white);
+        MANAGE_PRODUCT.setText("MANAGE PRODUCTS");
+        MANAGE_PRODUCT.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { MANAGE_PRODUCTActionPerformed(evt); } });
+        jPanel1.add(MANAGE_PRODUCT, new org.netbeans.lib.awtextra.AbsoluteConstraints(bx, by, bw, bh));
 
-        VIEW_INVENTORY.setBackground(new java.awt.Color(0, 0, 0));
-        VIEW_INVENTORY.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        VIEW_INVENTORY.setForeground(new java.awt.Color(255, 255, 255));
-        VIEW_INVENTORY.setText("VIEW INVENTORY");
-        VIEW_INVENTORY.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                VIEW_INVENTORYActionPerformed(evt);
-            }
-        });
-        jPanel1.add(VIEW_INVENTORY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 190, 160, 50));
-
-        MAKE_SALE.setBackground(new java.awt.Color(0, 0, 0));
-        MAKE_SALE.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        MAKE_SALE.setForeground(new java.awt.Color(255, 255, 255));
-        MAKE_SALE.setText("MAKE SALE");
-        MAKE_SALE.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MAKE_SALEActionPerformed(evt);
-            }
-        });
-        jPanel1.add(MAKE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 260, 160, 50));
-
-        MANAGE_SALE.setBackground(new java.awt.Color(0, 0, 0));
-        MANAGE_SALE.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        MANAGE_SALE.setForeground(new java.awt.Color(255, 255, 255));
+        // 2. MANAGE SALES
+        MANAGE_SALE.setBackground(black); MANAGE_SALE.setFont(btnFont); MANAGE_SALE.setForeground(white);
         MANAGE_SALE.setText("MANAGE SALES");
-        MANAGE_SALE.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MANAGE_SALEActionPerformed(evt);
-            }
-        });
-        jPanel1.add(MANAGE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 150, 160, 40));
+        MANAGE_SALE.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { MANAGE_SALEActionPerformed(evt); } });
+        jPanel1.add(MANAGE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(bx, by + gap, bw, bh));
 
-        APPROVE_REGISTER.setBackground(new java.awt.Color(0, 0, 0));
-        APPROVE_REGISTER.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        APPROVE_REGISTER.setForeground(new java.awt.Color(255, 255, 255));
-        APPROVE_REGISTER.setText("APPROVE REGISTER");
-        APPROVE_REGISTER.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                APPROVE_REGISTERActionPerformed(evt);
-            }
-        });
-        jPanel1.add(APPROVE_REGISTER, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 120, 160, 50));
-
-        MANAGE_USER.setBackground(new java.awt.Color(0, 0, 0));
-        MANAGE_USER.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        MANAGE_USER.setForeground(new java.awt.Color(255, 255, 255));
+        // 3. USER MANAGEMENT
+        MANAGE_USER.setBackground(black); MANAGE_USER.setFont(btnFont); MANAGE_USER.setForeground(white);
         MANAGE_USER.setText("USER MANAGEMENT");
-        MANAGE_USER.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MANAGE_USERActionPerformed(evt);
-            }
-        });
-        jPanel1.add(MANAGE_USER, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 200, 160, 40));
+        MANAGE_USER.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { MANAGE_USERActionPerformed(evt); } });
+        jPanel1.add(MANAGE_USER, new org.netbeans.lib.awtextra.AbsoluteConstraints(bx, by + gap*2, bw, bh));
 
-        SALES_REPORT.setBackground(new java.awt.Color(0, 0, 0));
-        SALES_REPORT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        SALES_REPORT.setForeground(new java.awt.Color(255, 255, 255));
-        SALES_REPORT.setText("SALES REPORT");
-        SALES_REPORT.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SALES_REPORTActionPerformed(evt);
-            }
-        });
-        jPanel1.add(SALES_REPORT, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 250, 160, 40));
-
-        LOW_STOCK.setBackground(new java.awt.Color(0, 0, 0));
-        LOW_STOCK.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        LOW_STOCK.setForeground(new java.awt.Color(255, 255, 255));
+        // 4. LOW STOCK
+        LOW_STOCK.setBackground(black); LOW_STOCK.setFont(btnFont); LOW_STOCK.setForeground(white);
         LOW_STOCK.setText("LOW STOCK ALERT");
-        LOW_STOCK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LOW_STOCKActionPerformed(evt);
-            }
-        });
-        jPanel1.add(LOW_STOCK, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, 160, 40));
+        LOW_STOCK.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { LOW_STOCKActionPerformed(evt); } });
+        jPanel1.add(LOW_STOCK, new org.netbeans.lib.awtextra.AbsoluteConstraints(bx, by + gap*3, bw, bh));
 
-        SEARCH_PRODUCT.setBackground(new java.awt.Color(0, 0, 0));
-        SEARCH_PRODUCT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        SEARCH_PRODUCT.setForeground(new java.awt.Color(255, 255, 255));
-        SEARCH_PRODUCT.setText("SEARCH COFFEE PRODUCT");
-        SEARCH_PRODUCT.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SEARCH_PRODUCTActionPerformed(evt);
-            }
-        });
-        jPanel1.add(SEARCH_PRODUCT, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 350, 160, 40));
+        // 5. REPORTS
+        SALES_REPORT.setBackground(black); SALES_REPORT.setFont(btnFont); SALES_REPORT.setForeground(white);
+        SALES_REPORT.setText("REPORTS");
+        SALES_REPORT.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { SALES_REPORTActionPerformed(evt); } });
+        jPanel1.add(SALES_REPORT, new org.netbeans.lib.awtextra.AbsoluteConstraints(bx, by + gap*4, bw, bh));
 
-        LOGOUT.setBackground(new java.awt.Color(0, 0, 0));
-        LOGOUT.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
-        LOGOUT.setForeground(new java.awt.Color(255, 255, 255));
+        // 6. ARCHIVED
+        ARCHIVED_PRODUCTS = new javax.swing.JButton();
+        ARCHIVED_PRODUCTS.setBackground(black); ARCHIVED_PRODUCTS.setFont(btnFont); ARCHIVED_PRODUCTS.setForeground(white);
+        ARCHIVED_PRODUCTS.setText("ARCHIVED");
+        ARCHIVED_PRODUCTS.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { ARCHIVED_PRODUCTSActionPerformed(evt); } });
+        jPanel1.add(ARCHIVED_PRODUCTS, new org.netbeans.lib.awtextra.AbsoluteConstraints(bx, by + gap*5, bw, bh));
+
+        // 7. LOGOUT — last
+        LOGOUT.setBackground(black); LOGOUT.setFont(btnFont); LOGOUT.setForeground(white);
         LOGOUT.setText("LOG OUT");
-        LOGOUT.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LOGOUTActionPerformed(evt);
-            }
-        });
-        jPanel1.add(LOGOUT, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 400, 160, 40));
+        LOGOUT.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { LOGOUTActionPerformed(evt); } });
+        jPanel1.add(LOGOUT, new org.netbeans.lib.awtextra.AbsoluteConstraints(bx, by + gap*6, bw, bh));
+
+        // Hidden (wiring only)
+        DASHBOARD_SUMMARY.setVisible(false); DASHBOARD_SUMMARY.setEnabled(false);
+        DASHBOARD_SUMMARY.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { DASHBOARD_SUMMARYActionPerformed(evt); } });
+        jPanel1.add(DASHBOARD_SUMMARY, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 0, 0));
+        VIEW_INVENTORY.setVisible(false); VIEW_INVENTORY.setEnabled(false);
+        VIEW_INVENTORY.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { VIEW_INVENTORYActionPerformed(evt); } });
+        jPanel1.add(VIEW_INVENTORY, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 0, 0));
+        MAKE_SALE.setVisible(false); MAKE_SALE.setEnabled(false);
+        MAKE_SALE.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { MAKE_SALEActionPerformed(evt); } });
+        jPanel1.add(MAKE_SALE, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 0, 0));
+        APPROVE_REGISTER.setVisible(false); APPROVE_REGISTER.setEnabled(false);
+        APPROVE_REGISTER.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { APPROVE_REGISTERActionPerformed(evt); } });
+        jPanel1.add(APPROVE_REGISTER, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 0, 0));
+        SEARCH_PRODUCT.setVisible(false); SEARCH_PRODUCT.setEnabled(false);
+        SEARCH_PRODUCT.addActionListener(new java.awt.event.ActionListener() { public void actionPerformed(java.awt.event.ActionEvent evt) { SEARCH_PRODUCTActionPerformed(evt); } });
+        jPanel1.add(SEARCH_PRODUCT, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 0, 0));
+        ARCHIVED_USERS = new javax.swing.JButton();
+        ARCHIVED_USERS.setVisible(false); ARCHIVED_USERS.setEnabled(false);
+        jPanel1.add(ARCHIVED_USERS, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 0, 0));
 
         jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("WELCOME TO ADMIN DASH BOARD");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 100, 400, 50));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 410, 500, 50));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/6.png"))); // NOI18N
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 530));
@@ -238,7 +195,7 @@ import util.AppUI;
     }
     
     private void SALES_REPORTActionPerformed(java.awt.event.ActionEvent evt) {
-        new test_package.ADMIN.SALES_REPORT_DASH().setVisible(true);
+        new test_package.ADMIN.REPORTS_DASH(currentUser).setVisible(true);
         this.dispose();
     }
     
@@ -248,17 +205,27 @@ import util.AppUI;
     }
     
     private void DASHBOARD_SUMMARYActionPerformed(java.awt.event.ActionEvent evt) {
-        new test_package.ADMIN.DASHBOARD_SUMMARY().setVisible(true);
+        new test_package.ADMIN.REPORTS_DASH(currentUser).setVisible(true);
         this.dispose();
     }
     
     private void SEARCH_PRODUCTActionPerformed(java.awt.event.ActionEvent evt) {
-        new test_package.ADMIN.SEARCH_PRODUCT_DASH().setVisible(true);
+        new test_package.ADMIN.MANAGE_PRODUCT_DASH(currentUser).setVisible(true);
         this.dispose();
     }
 
     private void VIEW_INVENTORYActionPerformed(java.awt.event.ActionEvent evt) {
         new test_package.ADMIN.VIEW_INVE_DASH().setVisible(true);
+        this.dispose();
+    }
+
+    private void ARCHIVED_PRODUCTSActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.ARCHIVED_DASH(currentUser).setVisible(true);
+        this.dispose();
+    }
+
+    private void ARCHIVED_USERSActionPerformed(java.awt.event.ActionEvent evt) {
+        new test_package.ADMIN.ARCHIVED_DASH(currentUser).setVisible(true);
         this.dispose();
     }
 
@@ -275,6 +242,8 @@ import util.AppUI;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton APPROVE_REGISTER;
+    private javax.swing.JButton ARCHIVED_PRODUCTS;
+    private javax.swing.JButton ARCHIVED_USERS;
     private javax.swing.JButton DASHBOARD_SUMMARY;
     private javax.swing.JButton LOGOUT;
     private javax.swing.JButton LOW_STOCK;
