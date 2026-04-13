@@ -2,6 +2,7 @@ package test_package.CASHIER;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Image;
 import java.util.List;
 import logic.User;
 import model.Product;
@@ -18,6 +19,9 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
         this.currentUser = user;
         initComponents();
         AppUI.setupFrame(this, "Coffee Shop POS - Create Sale", true);
+        String uname = (user != null) ? user.username : "Cashier";
+        jPanel1.add(AppUI.createHeader("Create Sale", uname, "CASHIER", this),
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 60));
         AppUI.styleTable(productTable);
         AppUI.styleTable(cartTable);
         AppUI.setPlaceholder(txtQty, "Qty");
@@ -28,6 +32,13 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
         AppUI.setupDefaultButton(this, btnAddToCart);
         loadProducts();
         setupCart();
+        // wire up search-by-name
+        txtSearch.addActionListener(evt -> filterProducts(txtSearch.getText().trim()));
+        btnSearch.addActionListener(evt -> filterProducts(txtSearch.getText().trim()));
+        // show image when product row is clicked
+        productTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) showSelectedProductImage();
+        });
     }
     
     private void setupCart() {
@@ -35,19 +46,49 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
     }
     
     private void loadProducts() {
+        filterProducts("");
+    }
+
+    private void filterProducts(String keyword) {
         try {
             DefaultTableModel tableModel = (DefaultTableModel) productTable.getModel();
             tableModel.setRowCount(0);
-            
             List<Product> products = ProductDao.getAllProducts();
             for (Product p : products) {
-                if (p.stock > 0) {
-                    tableModel.addRow(new Object[]{p.id, p.name, p.price, p.stock});
+                if (p.stock > 0 && p.isAvailable) {
+                    if (keyword.isEmpty() || p.name.toLowerCase().contains(keyword.toLowerCase())) {
+                        tableModel.addRow(new Object[]{p.id, p.name, p.price, p.stock});
+                    }
                 }
             }
+            clearImagePreview();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage());
         }
+    }
+
+    private void showSelectedProductImage() {
+        int row = productTable.getSelectedRow();
+        if (row == -1) { clearImagePreview(); return; }
+        try {
+            int id = (int) productTable.getValueAt(row, 0);
+            Product p = ProductDao.getProductById(id);
+            if (p != null && p.imagePath != null && !p.imagePath.isEmpty()) {
+                ImageIcon icon = new ImageIcon(p.imagePath);
+                Image scaled = icon.getImage().getScaledInstance(120, 100, Image.SCALE_SMOOTH);
+                imgProductPreview.setIcon(new ImageIcon(scaled));
+                imgProductPreview.setText("");
+            } else {
+                clearImagePreview();
+            }
+        } catch (Exception e) {
+            clearImagePreview();
+        }
+    }
+
+    private void clearImagePreview() {
+        imgProductPreview.setIcon(null);
+        imgProductPreview.setText("No Image");
     }
 
     @SuppressWarnings("unchecked")
@@ -69,6 +110,9 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
         btnBack = new javax.swing.JButton();
         lblTotal = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        txtSearch = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        imgProductPreview = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -85,7 +129,7 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(productTable);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 400, 200));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 400, 190));
 
         cartTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {},
@@ -100,6 +144,21 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 80, 440, 200));
 
+        // Search bar
+        javax.swing.JLabel lblSearch = new javax.swing.JLabel("Search:");
+        lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 13));
+        lblSearch.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 60, 25));
+
+        txtSearch.setFont(new java.awt.Font("Sitka Display", 0, 13));
+        jPanel1.add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 80, 220, 25));
+
+        btnSearch.setBackground(new java.awt.Color(0, 0, 0));
+        btnSearch.setFont(new java.awt.Font("Sitka Display", 1, 12));
+        btnSearch.setForeground(new java.awt.Color(255, 255, 255));
+        btnSearch.setText("SEARCH");
+        jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 80, 90, 25));
+
         jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 14));
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Available Products");
@@ -110,13 +169,22 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
         jLabel2.setText("Shopping Cart");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 50, -1, -1));
 
+        // Image preview
+        imgProductPreview.setPreferredSize(new java.awt.Dimension(120, 100));
+        imgProductPreview.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        imgProductPreview.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        imgProductPreview.setText("No Image");
+        imgProductPreview.setForeground(new java.awt.Color(200, 200, 200));
+        imgProductPreview.setFont(new java.awt.Font("Sitka Display", 0, 10));
+        jPanel1.add(imgProductPreview, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 310, 120, 100));
+
         jLabel3.setFont(new java.awt.Font("Sitka Display", 1, 12));
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Quantity:");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 300, -1, -1));
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 320, -1, -1));
 
         txtQty.setText("1");
-        jPanel1.add(txtQty, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, 80, -1));
+        jPanel1.add(txtQty, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 320, 80, -1));
 
         btnAddToCart.setBackground(new java.awt.Color(0, 0, 0));
         btnAddToCart.setFont(new java.awt.Font("Sitka Display", 1, 12));
@@ -127,7 +195,7 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
                 btnAddToCartActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAddToCart, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 295, 130, 30));
+        jPanel1.add(btnAddToCart, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 355, 130, 30));
 
         btnRemoveFromCart.setBackground(new java.awt.Color(0, 0, 0));
         btnRemoveFromCart.setFont(new java.awt.Font("Sitka Display", 1, 12));
@@ -333,7 +401,9 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnCompleteSale;
     private javax.swing.JButton btnRemoveFromCart;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JTable cartTable;
+    private javax.swing.JLabel imgProductPreview;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -344,5 +414,6 @@ public class CREATE_SALE_DASH extends javax.swing.JFrame {
     private javax.swing.JLabel lblTotal;
     private javax.swing.JTable productTable;
     private javax.swing.JTextField txtQty;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

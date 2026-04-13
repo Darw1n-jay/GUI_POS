@@ -21,7 +21,7 @@ public class LOW_STOCK_DASH extends javax.swing.JFrame {
         try {
             List<Product> products = ProductDao.getAllProducts();
             for (Product p : products) {
-                if (p.stock <= threshold && (text.isEmpty() || String.valueOf(p.id).contains(text))) {
+                if (p.stock <= threshold && (text.isEmpty() || p.name.toLowerCase().contains(text.toLowerCase()))) {
                     tableModel.addRow(new Object[]{p.id, p.name, p.price, p.stock});
                 }
             }
@@ -91,7 +91,7 @@ public class LOW_STOCK_DASH extends javax.swing.JFrame {
         // Search bar
         lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 14));
         lblSearch.setForeground(new java.awt.Color(255, 255, 255));
-        lblSearch.setText("Search Product ID:");
+        lblSearch.setText("Search Product Name:");
         jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 65, 155, 30));
 
         txtSearchId.setFont(new java.awt.Font("Sitka Display", 0, 14));

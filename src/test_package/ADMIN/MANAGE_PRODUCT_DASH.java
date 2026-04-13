@@ -6,6 +6,8 @@
 package test_package.ADMIN;
 
 import db.DBConnection;
+import java.awt.Image;
+import java.io.File;
 import java.sql.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,6 +19,7 @@ import util.AppUI;
 
 public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
     private User currentUser;
+    private String selectedImagePath = null;
 
     /**
      * Creates new form MANAGE_PRODUCT_DASH
@@ -29,6 +32,9 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
         this.currentUser = user;
         initComponents();
         AppUI.setupFrame(this, "Coffee Shop POS - Manage Products", true);
+        String uname = (user != null) ? user.username : "Admin";
+        jPanel1.add(AppUI.createHeader("Manage Products", uname, "ADMIN", this),
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 60));
         AppUI.styleTable(productTable);
         AppUI.setPlaceholder(txtName, "e.g. Cappuccino");
         AppUI.setPlaceholder(txtCategory, "e.g. Hot Coffee");
@@ -55,7 +61,7 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
             tableModel.setRowCount(0);
             List<Product> products = ProductDao.getAllProducts();
             for (Product p : products) {
-                if (keyword.isEmpty() || String.valueOf(p.id).contains(keyword)) {
+                if (keyword.isEmpty() || p.name.toLowerCase().contains(keyword.toLowerCase())) {
                     tableModel.addRow(new Object[]{p.id, p.name, p.category, p.price, p.stock,
                         p.isAvailable ? "Available" : "Unavailable"});
                 }
@@ -111,11 +117,11 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 540, 300));
 
         // Search bar
-        javax.swing.JLabel lblSearch = new javax.swing.JLabel("Search ID:");
+        javax.swing.JLabel lblSearch = new javax.swing.JLabel("Search Name:");
         lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 13));
         lblSearch.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 70, 25));
-        jPanel1.add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(105, 30, 280, 25));
+        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 90, 25));
+        jPanel1.add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(125, 30, 260, 25));
 
         btnSearch.setBackground(new java.awt.Color(0, 0, 0));
         btnSearch.setFont(new java.awt.Font("Sitka Display", 1, 12));
@@ -149,6 +155,38 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
         jPanel1.add(txtPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 150, 180, -1));
         jPanel1.add(txtStock, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 190, 180, -1));
 
+        // Image label
+        javax.swing.JLabel lblImage = new javax.swing.JLabel("Photo:");
+        lblImage.setFont(new java.awt.Font("Sitka Display", 1, 14));
+        lblImage.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(lblImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 230, -1, -1));
+
+        // Image preview
+        imgPreview = new javax.swing.JLabel();
+        imgPreview.setPreferredSize(new java.awt.Dimension(100, 80));
+        imgPreview.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        imgPreview.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        imgPreview.setText("No Image");
+        imgPreview.setForeground(new java.awt.Color(200, 200, 200));
+        imgPreview.setFont(new java.awt.Font("Sitka Display", 0, 10));
+        jPanel1.add(imgPreview, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 225, 100, 80));
+
+        // Browse button
+        btnBrowseImage = new javax.swing.JButton("BROWSE");
+        btnBrowseImage.setBackground(new java.awt.Color(50, 50, 50));
+        btnBrowseImage.setFont(new java.awt.Font("Sitka Display", 1, 11));
+        btnBrowseImage.setForeground(new java.awt.Color(255, 255, 255));
+        btnBrowseImage.addActionListener(evt -> browseImage());
+        jPanel1.add(btnBrowseImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 225, 80, 25));
+
+        // Clear image button
+        btnClearImage = new javax.swing.JButton("CLEAR");
+        btnClearImage.setBackground(new java.awt.Color(50, 50, 50));
+        btnClearImage.setFont(new java.awt.Font("Sitka Display", 1, 11));
+        btnClearImage.setForeground(new java.awt.Color(255, 255, 255));
+        btnClearImage.addActionListener(evt -> clearImage());
+        jPanel1.add(btnClearImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 255, 80, 25));
+
         btnAdd.setBackground(new java.awt.Color(0, 0, 0));
         btnAdd.setFont(new java.awt.Font("Sitka Display", 1, 12));
         btnAdd.setForeground(new java.awt.Color(255, 255, 255));
@@ -158,7 +196,7 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
                 btnAddActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 240, 90, -1));
+        jPanel1.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 320, 90, -1));
 
         btnUpdate.setBackground(new java.awt.Color(0, 0, 0));
         btnUpdate.setFont(new java.awt.Font("Sitka Display", 1, 12));
@@ -169,7 +207,7 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
                 btnUpdateActionPerformed(evt);
             }
         });
-        jPanel1.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 240, 90, -1));
+        jPanel1.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 320, 90, -1));
 
         btnDelete.setBackground(new java.awt.Color(0, 0, 0));
         btnDelete.setFont(new java.awt.Font("Sitka Display", 1, 12));
@@ -180,7 +218,7 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
                 btnDeleteActionPerformed(evt);
             }
         });
-        jPanel1.add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 240, 90, -1));
+        jPanel1.add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 320, 90, -1));
 
         btnToggleAvail = new javax.swing.JButton();
         btnToggleAvail.setBackground(new java.awt.Color(0, 102, 51));
@@ -188,7 +226,7 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
         btnToggleAvail.setForeground(new java.awt.Color(255, 255, 255));
         btnToggleAvail.setText("TOGGLE AVAIL");
         btnToggleAvail.addActionListener(evt -> btnToggleAvailActionPerformed(evt));
-        jPanel1.add(btnToggleAvail, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 280, 140, -1));
+        jPanel1.add(btnToggleAvail, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 360, 140, -1));
 
         btnBack.setBackground(new java.awt.Color(0, 0, 0));
         btnBack.setFont(new java.awt.Font("Sitka Display", 1, 12));
@@ -226,6 +264,19 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
         txtCategory.setText(productTable.getValueAt(row, 2) != null ? productTable.getValueAt(row, 2).toString() : "");
         txtPrice.setText(productTable.getValueAt(row, 3).toString());
         txtStock.setText(productTable.getValueAt(row, 4).toString());
+        // Load image for selected product
+        try {
+            int id = (int) productTable.getValueAt(row, 0);
+            Product p = ProductDao.getProductById(id);
+            if (p != null && p.imagePath != null && !p.imagePath.isEmpty()) {
+                selectedImagePath = p.imagePath;
+                showImagePreview(p.imagePath);
+            } else {
+                clearImage();
+            }
+        } catch (Exception e) {
+            clearImage();
+        }
     }
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
@@ -240,13 +291,14 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
                 return;
             }
             
-            ProductDao.addProduct(name, category.isEmpty() ? null : category, price, stock);
+            ProductDao.addProduct(name, category.isEmpty() ? null : category, price, stock, selectedImagePath);
             JOptionPane.showMessageDialog(this, "Product added successfully!");
             loadProducts();
             txtName.setText("");
             txtCategory.setText("");
             txtPrice.setText("");
             txtStock.setText("");
+            clearImage();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Please enter valid numbers for price and stock!");
         } catch (Exception e) {
@@ -274,7 +326,9 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
                 return;
             }
             
-            ProductDao.updateProduct(id, name, category.isEmpty() ? null : category, price, stock);
+            // updateImage=true so image_path is always saved (even if null to clear it)
+            ProductDao.updateProduct(id, name, category.isEmpty() ? null : category, price, stock,
+                                     selectedImagePath, true);
             JOptionPane.showMessageDialog(this, "Product updated successfully!");
             loadProducts();
         } catch (NumberFormatException e) {
@@ -331,6 +385,37 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
         this.dispose();
     }
 
+    private void browseImage() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Select Product Image");
+        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
+            "Image Files (*.jpg, *.jpeg, *.png, *.gif)", "jpg", "jpeg", "png", "gif"));
+        int result = chooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            selectedImagePath = file.getAbsolutePath();
+            showImagePreview(selectedImagePath);
+        }
+    }
+
+    private void showImagePreview(String path) {
+        try {
+            ImageIcon icon = new ImageIcon(path);
+            Image scaled = icon.getImage().getScaledInstance(100, 80, Image.SCALE_SMOOTH);
+            imgPreview.setIcon(new ImageIcon(scaled));
+            imgPreview.setText("");
+        } catch (Exception e) {
+            imgPreview.setIcon(null);
+            imgPreview.setText("Invalid");
+        }
+    }
+
+    private void clearImage() {
+        selectedImagePath = null;
+        imgPreview.setIcon(null);
+        imgPreview.setText("No Image");
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -348,6 +433,9 @@ public class MANAGE_PRODUCT_DASH extends javax.swing.JFrame {
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnToggleAvail;
     private javax.swing.JButton btnUpdate;
+    private javax.swing.JButton btnBrowseImage;
+    private javax.swing.JButton btnClearImage;
+    private javax.swing.JLabel imgPreview;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

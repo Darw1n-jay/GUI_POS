@@ -17,6 +17,9 @@ public class MY_SALES_DASH extends javax.swing.JFrame {
     public MY_SALES_DASH(User user) {
         this.currentUser = user;
         initComponents();
+        String uname = (user != null) ? user.username : "Cashier";
+        jPanel1.add(util.AppUI.createHeader("My Sales", uname, "CASHIER", this),
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 60));
         loadMySales();
     }
     

@@ -35,7 +35,7 @@ public class ARCHIVED_DASH extends javax.swing.JFrame {
         m.setRowCount(0);
         try {
             for (model.Product p : ProductDao.getArchivedProducts()) {
-                if (text.isEmpty() || String.valueOf(p.id).contains(text))
+                if (text.isEmpty() || p.name.toLowerCase().contains(text.toLowerCase()))
                     m.addRow(new Object[]{p.id, p.name, p.category, p.price, p.stock});
             }
         } catch (Exception e) {
@@ -48,7 +48,7 @@ public class ARCHIVED_DASH extends javax.swing.JFrame {
         m.setRowCount(0);
         try {
             for (model.User u : UserDao.getArchivedUsers()) {
-                if (text.isEmpty() || String.valueOf(u.id).contains(text))
+                if (text.isEmpty() || u.username.toLowerCase().contains(text.toLowerCase()))
                     m.addRow(new Object[]{u.id, u.username, u.role});
             }
         } catch (Exception e) {
@@ -94,9 +94,9 @@ public class ARCHIVED_DASH extends javax.swing.JFrame {
 
         productPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        JLabel lblPS = new JLabel("Search ID:");
+        JLabel lblPS = new JLabel("Search Name:");
         lblPS.setFont(new java.awt.Font("Sitka Display", java.awt.Font.BOLD, 13));
-        productPanel.add(lblPS,            new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 85, 25));
+        productPanel.add(lblPS,            new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 100, 25));
         productPanel.add(txtProductSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, 140, 25));
 
         btnProductSearch.setBackground(java.awt.Color.BLACK);
@@ -123,9 +123,9 @@ public class ARCHIVED_DASH extends javax.swing.JFrame {
 
         userPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        JLabel lblUS = new JLabel("Search ID:");
+        JLabel lblUS = new JLabel("Search Username:");
         lblUS.setFont(new java.awt.Font("Sitka Display", java.awt.Font.BOLD, 13));
-        userPanel.add(lblUS,          new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 85, 25));
+        userPanel.add(lblUS,          new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 120, 25));
         userPanel.add(txtUserSearch,  new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, 140, 25));
 
         btnUserSearch.setBackground(java.awt.Color.BLACK);

@@ -22,7 +22,7 @@ public class USER_MANAGEMENT_DASH extends javax.swing.JFrame {
         try {
             List<User> users = UserDao.getAllUsers();
             for (User u : users) {
-                if (text.isEmpty() || String.valueOf(u.id).contains(text)) {
+                if (text.isEmpty() || u.username.toLowerCase().contains(text.toLowerCase())) {
                     tableModel.addRow(new Object[]{u.id, u.username, u.role, getApprovalStatus(u.id)});
                 }
             }
@@ -112,7 +112,7 @@ public class USER_MANAGEMENT_DASH extends javax.swing.JFrame {
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 850, 280));
 
         // Search bar
-        lblSearch = new javax.swing.JLabel("Search User ID:");
+        lblSearch = new javax.swing.JLabel("Search Username:");
         lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 14));
         lblSearch.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 65, 140, 30));

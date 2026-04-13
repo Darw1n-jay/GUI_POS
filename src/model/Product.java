@@ -7,6 +7,7 @@ public class Product {
     public double price;
     public int stock;
     public boolean isAvailable = true;
+    public String imagePath;
     
     public Product() {}
     

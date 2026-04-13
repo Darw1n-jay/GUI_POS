@@ -23,6 +23,8 @@ public class LOG_IN extends javax.swing.JFrame {
    public LOG_IN() {
         initComponents();
         AppUI.setupFrame(this, "Coffee Shop POS - Login", true);
+        jPanel1.add(AppUI.createHeader("Welcome — Please Log In", null, null, this),
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 60));
         AppUI.setPlaceholder(USER_NAME, "Username");
         AppUI.setPasswordFieldFeatures(PASSWORD, "Password");
         AppUI.makePrimary(LOG_INBTN);

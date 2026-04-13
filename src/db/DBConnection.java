@@ -169,6 +169,11 @@ public class DBConnection {
                 stmt.execute("ALTER TABLE users ADD COLUMN is_archived INTEGER DEFAULT 0");
             } catch (SQLException e) { /* already exists */ }
 
+            // Add image_path column to products if not exists
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN image_path TEXT");
+            } catch (SQLException e) { /* already exists */ }
+
         } catch (SQLException e) {
             System.err.println("Error creating tables: " + e.getMessage());
         }

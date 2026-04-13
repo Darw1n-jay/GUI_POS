@@ -17,17 +17,16 @@ import util.AppUI;
    public CASHIER_DASH(User user) {
     initComponents();
     this.currentUser = user;
-
-    // optional: show username somewhere 
-    // lblUsername.setText(user.username);
     AppUI.setupFrame(this, "Coffee Shop POS - Cashier Dashboard", true);
+    // Add header
+    String uname = (user != null) ? user.username : "Cashier";
+    jPanel1.add(AppUI.createHeader("Cashier Dashboard", uname, "CASHIER", this),
+        new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 60));
     AppUI.makeSecondary(jButton1);
     AppUI.makeSecondary(jButton2);
     AppUI.makeSecondary(jButton3);
     AppUI.makeSecondary(jButton4);
-    if (user != null && user.username != null) {
-        jLabel1.setText("WELCOME, " + user.username.toUpperCase() + " (CASHIER)");
-    }
+    // username shown in header
       }
 
     @SuppressWarnings("unchecked")
@@ -55,7 +54,7 @@ import util.AppUI;
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 50, 160, 50));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 80, 160, 50));
 
         jButton2.setBackground(new java.awt.Color(0, 0, 0));
         jButton2.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
@@ -66,7 +65,7 @@ import util.AppUI;
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 160, 160, 50));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 175, 160, 50));
 
         jButton3.setBackground(new java.awt.Color(0, 0, 0));
         jButton3.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
@@ -77,7 +76,7 @@ import util.AppUI;
                 jButton3ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 260, 160, 50));
+        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 270, 160, 50));
 
         jButton4.setBackground(new java.awt.Color(0, 0, 0));
         jButton4.setFont(new java.awt.Font("Sitka Display", 1, 14)); // NOI18N
@@ -88,11 +87,11 @@ import util.AppUI;
                 jButton4ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 360, 160, 50));
+        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 365, 160, 50));
 
         jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("WELCOME TO CASHIER DASH BOARD");
+        jLabel1.setText("");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 410, 400, 50));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/6.png"))); // NOI18N

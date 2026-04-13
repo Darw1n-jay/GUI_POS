@@ -25,7 +25,7 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
             List<Sale> sales = SaleDao.getAllSales();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (Sale s : sales) {
-                if (text.isEmpty() || String.valueOf(s.id).contains(text)) {
+                if (text.isEmpty() || String.valueOf(s.cashierId).contains(text)) {
                     model.addRow(new Object[]{
                         s.id,
                         s.cashierId,
@@ -98,8 +98,8 @@ public class MANAGE_SALES_DASH extends javax.swing.JFrame {
         // Search bar
         lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 14));
         lblSearch.setForeground(new java.awt.Color(255, 255, 255));
-        lblSearch.setText("Search Sale ID:");
-        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 65, 130, 30));
+        lblSearch.setText("Search Cashier ID:");
+        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 65, 150, 30));
 
         txtSearchId.setFont(new java.awt.Font("Sitka Display", 0, 14));
         jPanel1.add(txtSearchId, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 65, 150, 30));

@@ -20,7 +20,7 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
         try {
             List<User> users = UserDao.getAllUsers();
             for (User u : users) {
-                if (text.isEmpty() || String.valueOf(u.id).contains(text)) {
+                if (text.isEmpty() || u.username.toLowerCase().contains(text.toLowerCase())) {
                     tableModel.addRow(new Object[]{u.id, u.username, u.role});
                 }
             }
@@ -79,18 +79,18 @@ public class MANAGE_USER_DASH extends javax.swing.JFrame {
         // Search bar
         lblSearch.setFont(new java.awt.Font("Sitka Display", 1, 14));
         lblSearch.setForeground(new java.awt.Color(255, 255, 255));
-        lblSearch.setText("Search User ID:");
-        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 65, 130, 30));
+        lblSearch.setText("Search Username:");
+        jPanel1.add(lblSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 65, 140, 30));
 
         txtSearchId.setFont(new java.awt.Font("Sitka Display", 0, 14));
-        jPanel1.add(txtSearchId, new org.netbeans.lib.awtextra.AbsoluteConstraints(235, 65, 150, 30));
+        jPanel1.add(txtSearchId, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 65, 150, 30));
 
         btnSearch.setBackground(new java.awt.Color(0, 0, 0));
         btnSearch.setFont(new java.awt.Font("Sitka Display", 1, 13));
         btnSearch.setForeground(new java.awt.Color(255, 255, 255));
         btnSearch.setText("SEARCH");
         btnSearch.addActionListener(evt -> searchById());
-        jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(395, 65, 100, 30));
+        jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 65, 100, 30));
 
         btnDelete.setBackground(new java.awt.Color(0, 0, 0));
         btnDelete.setFont(new java.awt.Font("Sitka Display", 1, 14));

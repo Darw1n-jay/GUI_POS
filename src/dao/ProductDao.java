@@ -34,6 +34,7 @@ public class ProductDao {
         p.price = rs.getDouble("price");
         p.stock = rs.getInt("stock");
         try { p.isAvailable = rs.getInt("is_available") == 1; } catch (SQLException e) { p.isAvailable = true; }
+        try { p.imagePath = rs.getString("image_path"); } catch (SQLException e) { p.imagePath = null; }
         return p;
     }
 
@@ -43,29 +44,46 @@ public class ProductDao {
         + "WHERE p.is_archived = 0";
 
     public static void addProduct(String name, String category, double price, int stock) throws Exception {
+        addProduct(name, category, price, stock, null);
+    }
+
+    public static void addProduct(String name, String category, double price, int stock, String imagePath) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             int catId = getOrCreateCategoryId(conn, category);
-            String sql = "INSERT INTO products(name, category_id, price, stock) VALUES(?, ?, ?, ?)";
+            String sql = "INSERT INTO products(name, category_id, price, stock, image_path) VALUES(?, ?, ?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, name);
                 ps.setInt(2, catId);
                 ps.setDouble(3, price);
                 ps.setInt(4, stock);
+                ps.setString(5, imagePath);
                 ps.executeUpdate();
             }
         }
     }
 
     public static void updateProduct(int id, String name, String category, double price, int stock) throws Exception {
+        updateProduct(id, name, category, price, stock, null, false);
+    }
+
+    public static void updateProduct(int id, String name, String category, double price, int stock,
+                                     String imagePath, boolean updateImage) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             int catId = getOrCreateCategoryId(conn, category);
-            String sql = "UPDATE products SET name=?, category_id=?, price=?, stock=? WHERE id=?";
+            String sql = updateImage
+                ? "UPDATE products SET name=?, category_id=?, price=?, stock=?, image_path=? WHERE id=?"
+                : "UPDATE products SET name=?, category_id=?, price=?, stock=? WHERE id=?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, name);
                 ps.setInt(2, catId);
                 ps.setDouble(3, price);
                 ps.setInt(4, stock);
-                ps.setInt(5, id);
+                if (updateImage) {
+                    ps.setString(5, imagePath);
+                    ps.setInt(6, id);
+                } else {
+                    ps.setInt(5, id);
+                }
                 ps.executeUpdate();
             }
         }

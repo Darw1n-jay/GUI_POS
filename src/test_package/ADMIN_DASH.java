@@ -17,6 +17,10 @@ import util.AppUI;
             initComponents();
            this.currentUser = user;
            AppUI.setupFrame(this, "Coffee Shop POS - Admin Dashboard", true);
+           // Add header
+           String uname = (user != null) ? user.username : "Admin";
+    jPanel1.add(AppUI.createHeader("Admin Dashboard", uname, "ADMIN", this),
+               new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 60));
            AppUI.makeSecondary(DASHBOARD_SUMMARY);
            AppUI.makeSecondary(MANAGE_PRODUCT);
            AppUI.makeSecondary(VIEW_INVENTORY);
@@ -46,7 +50,7 @@ import util.AppUI;
            // Rename buttons
            SALES_REPORT.setText("REPORTS");
            if (user != null && user.username != null) {
-               jLabel1.setText("WELCOME, " + user.username.toUpperCase());
+               // username shown in header
            }
          }
     @SuppressWarnings("unchecked")
@@ -145,7 +149,7 @@ import util.AppUI;
 
         jLabel1.setFont(new java.awt.Font("Sitka Display", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("WELCOME TO ADMIN DASH BOARD");
+        jLabel1.setText("");
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 410, 500, 50));
 

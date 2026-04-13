@@ -13,6 +13,9 @@ public class MY_PRODUCTS_DASH extends javax.swing.JFrame {
     public MY_PRODUCTS_DASH(User user) {
         this.currentUser = user;
         initComponents();
+        String uname = (user != null) ? user.username : "Cashier";
+        jPanel1.add(util.AppUI.createHeader("My Products", uname, "CASHIER", this),
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 60));
         loadProducts();
     }
     
